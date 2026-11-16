@@ -1,0 +1,126 @@
+/* AppWheel - colours match the prototype */
+:root {
+    --ground: #15112b;
+    --card: #221c42;
+    --line: #3d3466;
+    --text: #f4f1ff;
+    --muted: #c9c2e8;
+    --accent: #a78bfa;
+    --accent-dark: #15112b;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #fb7185;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+a { color: #c4b5fd; }
+a:hover { color: #ddd6fe; }
+
+.skip-link {
+    position: absolute;
+    left: -999px;
+}
+.skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+    background: var(--accent);
+    color: var(--accent-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    z-index: 10;
+}
+
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.25rem 0;
+    max-width: 40rem;
+    margin: 0 auto;
+}
+.brand { text-decoration: none; color: var(--text); display: flex; flex-direction: column; }
+.brand-name { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+.brand-slogan { font-size: 0.8rem; font-weight: 600; color: #c4b5fd; }
+
+.page { max-width: 40rem; margin: 0 auto; padding: 1.25rem; }
+
+.card, .page > form, .page > section {
+    background: var(--card);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+}
+
+h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; font-weight: 800; }
+.lead { color: #c4b5fd; font-weight: 600; margin-top: 0; }
+
+/* Forms (including django-allauth's) */
+label { display: block; font-weight: 700; margin: 1rem 0 0.35rem; }
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #4a4170;
+    background: #1b1636;
+    color: var(--text);
+    font: inherit;
+}
+input:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+input[type="checkbox"] { width: 1.25rem; height: 1.25rem; accent-color: var(--accent); }
+
+button, .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    margin-top: 1.25rem;
+    padding: 0 1.5rem;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-dark);
+    font: inherit;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+}
+.button-danger { background: var(--red); }
+.link-button {
+    background: none;
+    color: #c4b5fd;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: 0 0.5rem;
+    text-decoration: underline;
+    font-weight: 700;
+}
+
+.plain-list { padding-left: 1.2rem; }
+.plain-list li { margin: 0.4rem 0; }
+
+.messages { margin-bottom: 1rem; }
+.message {
+    background: var(--card);
+    border-left: 4px solid var(--accent);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin: 0 0 0.5rem;
+}
+.message-success { border-left-color: var(--green); }
+.message-error { border-left-color: var(--red); }
+.errorlist { color: #fda4af; padding-left: 1.2rem; }
