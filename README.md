@@ -21,9 +21,28 @@ AppWheel shows every app and subscription you pay for on one spinning wheel. Eac
 - HTML, CSS and JavaScript
 - Hosted on Heroku
 
+## Running it locally
+
+1. Clone the repo and open the folder.
+2. Create and switch on a virtual environment:
+   ```
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+3. Install the packages:
+   ```
+   pip install -r requirements.txt
+   ```
+4. Copy `.env.example` to `.env` and add your own `SECRET_KEY`.
+5. Start the server:
+   ```
+   python manage.py runserver
+   ```
+6. Open http://127.0.0.1:8000
+
 ## Status
 
-In development. Setup instructions will be added as the project is built.
+In development.
 
 ## Author
 
