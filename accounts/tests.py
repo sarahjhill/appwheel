@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 User = get_user_model()
@@ -31,3 +31,23 @@ class DeleteAccountTests(TestCase):
     def test_without_typing_delete_nothing_happens(self):
         self.client.post(reverse('delete_account'), {'confirm': 'yes'})
         self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+
+GOOGLE_TEST_SETTINGS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "APPS": [{"client_id": "test-id", "secret": "test-secret", "key": ""}],
+    }
+}
+
+
+class GoogleSignInTests(TestCase):
+    @override_settings(SOCIALACCOUNT_PROVIDERS=GOOGLE_TEST_SETTINGS)
+    def test_google_button_shows_when_keys_are_set(self):
+        response = self.client.get(reverse("account_login"))
+        self.assertContains(response, "Google")
+
+    @override_settings(SOCIALACCOUNT_PROVIDERS={"google": {"APPS": []}})
+    def test_no_google_button_without_keys(self):
+        response = self.client.get(reverse("account_login"))
+        self.assertNotContains(response, "google/login")

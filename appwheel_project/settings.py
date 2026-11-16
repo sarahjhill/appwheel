@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     # AppWheel's own apps
     'core',
     'accounts',
@@ -165,3 +166,29 @@ ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'AppWheel <hello@appwheel.local>'
+
+# ---------------------------------------------------------------
+# Sign in with Google
+# The keys live in .env (never in GitHub). The Google button only
+# appears once GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set.
+# ---------------------------------------------------------------
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        # Only ask Google for the person's name and email
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "APPS": (
+            [{"client_id": GOOGLE_CLIENT_ID, "secret": GOOGLE_CLIENT_SECRET, "key": ""}]
+            if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+            else []
+        ),
+    }
+}
+
+# If someone signed up with email and later uses Google with the same
+# (Google-verified) email, log them into their existing account.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
