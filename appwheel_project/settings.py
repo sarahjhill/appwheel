@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'wheel',
+    'reminders',
 ]
 
 MIDDLEWARE = [

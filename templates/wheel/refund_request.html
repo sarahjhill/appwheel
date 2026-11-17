@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block head_title %}Ask {{ subscription.name }} for a refund{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Charged after cancelling?</h1>
+        <p class="lead">Here's a message you can send to {{ subscription.name }}. Change the parts in [square brackets].</p>
+
+        <label for="refund-text">Your refund request</label>
+        <textarea id="refund-text" class="refund-text" rows="13" readonly>Subject: Refund for a payment taken after I cancelled
+
+Hello,
+
+I cancelled my {{ subscription.name }} subscription on {% if subscription.cancelled_on %}{{ subscription.cancelled_on|date:"j F Y" }}{% else %}[date you cancelled]{% endif %}. However, I was charged £{{ subscription.price|floatformat:"2g" }} on [date of the payment].
+
+As I had already cancelled, please refund this payment to my original payment method.
+
+My account email address is {{ user.email }}.
+
+Please confirm when the refund has been made.
+
+Thank you,
+[Your name]</textarea>
+        <button type="button" class="button" data-copy="refund-text">Copy the message</button>
+        <p class="help-text" data-copied hidden role="status">Copied. Paste it into an email or the company's help chat.</p>
+
+        <h2>Where to send it</h2>
+        <ul class="plain-list">
+            {% if subscription.common_app.help_url %}
+                <li><a href="{{ subscription.common_app.help_url }}" target="_blank" rel="noopener noreferrer">{{ subscription.name }}'s help page</a></li>
+            {% endif %}
+            <li>Use the contact details on {{ subscription.name }}'s official website or app, or reply to your cancellation email.</li>
+            <li><strong>Paid through Apple?</strong> Ask Apple for the refund at <a href="https://reportaproblem.apple.com" target="_blank" rel="noopener noreferrer">reportaproblem.apple.com</a>.</li>
+        </ul>
+
+        <h2>If they won't refund you</h2>
+        <ul class="plain-list">
+            <li><strong>Direct Debit:</strong> the Direct Debit Guarantee means your bank must refund a payment taken in error straight away. Call your bank and say it was taken after you cancelled.</li>
+            <li><strong>Debit or credit card:</strong> ask your bank about a <strong>chargeback</strong>.</li>
+        </ul>
+        <p class="help-text">This is general guidance, not legal advice.</p>
+
+        <p><a href="{% url 'subscription_list' %}">Back to my apps</a></p>
+    </section>
+{% endblock content %}
+
+{% block extra_body %}
+<script>
+    document.querySelectorAll('[data-copy]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var text = document.getElementById(button.dataset.copy);
+            var done = document.querySelector('[data-copied]');
+            function showDone() { done.hidden = false; }
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text.value).then(showDone, function () { text.select(); });
+            } else {
+                text.select();
+                document.execCommand('copy');
+                showDone();
+            }
+        });
+    });
+</script>
+{% endblock extra_body %}

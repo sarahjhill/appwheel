@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block head_title %}Cancel {{ subscription.name }}{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Cancel {{ subscription.name }}</h1>
+        {% if subscription.next_payment_date %}
+            <p class="lead">Cancel before {{ subscription.next_payment_date|date:"j F" }} so you're not charged {% if subscription.price %}£{{ subscription.price|floatformat:"2g" }}{% endif %} again.</p>
+        {% else %}
+            <p class="lead">We'll walk you through it.</p>
+        {% endif %}
+
+        {% with common=subscription.common_app %}
+            {% if common.cancel_url %}
+                <p><a class="button" href="{{ common.cancel_url }}" target="_blank" rel="noopener noreferrer">Open {{ common.name }}'s cancel page<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+            {% endif %}
+
+            {% if subscription.cancel_step_list %}
+                <h2>How to cancel</h2>
+                <ol class="steps">
+                    {% for step in subscription.cancel_step_list %}<li>{{ step }}</li>{% endfor %}
+                </ol>
+                {% if common.help_url %}<p><a href="{{ common.help_url }}" target="_blank" rel="noopener noreferrer">{{ common.name }}'s help page</a></p>{% endif %}
+            {% else %}
+                <h2>How do you pay for {{ subscription.name }}?</h2>
+                <p class="help-text">Choose the one that matches. If you're not sure, check your bank statement: payments through Apple say "APPLE.COM/BILL" and Google ones say "GOOGLE".</p>
+
+                <details class="pay-route">
+                    <summary>Through my iPhone or iPad (Apple)</summary>
+                    <ol class="steps">
+                        <li>Open the <strong>Settings</strong> app.</li>
+                        <li>Tap <strong>your name</strong> at the top.</li>
+                        <li>Tap <strong>Subscriptions</strong>.</li>
+                        <li>Tap <strong>{{ subscription.name }}</strong>.</li>
+                        <li>Tap <strong>Cancel Subscription</strong> and confirm.</li>
+                    </ol>
+                </details>
+                <details class="pay-route">
+                    <summary>Through Google Play (Android)</summary>
+                    <ol class="steps">
+                        <li>Open the <strong>Play Store</strong> app.</li>
+                        <li>Tap <strong>your picture</strong> at the top right.</li>
+                        <li>Tap <strong>Payments and subscriptions</strong>, then <strong>Subscriptions</strong>.</li>
+                        <li>Tap <strong>{{ subscription.name }}</strong>, then <strong>Cancel subscription</strong>.</li>
+                    </ol>
+                </details>
+                <details class="pay-route">
+                    <summary>On {{ subscription.name }}'s own website or app</summary>
+                    <ol class="steps">
+                        <li>Sign in on {{ subscription.name }}'s <strong>official</strong> website or app. Type the address yourself rather than using a link in an email or advert.</li>
+                        <li>Go to <strong>Account</strong> or <strong>Settings</strong>.</li>
+                        <li>Look for <strong>Membership</strong>, <strong>Plan</strong>, <strong>Subscription</strong> or <strong>Billing</strong>.</li>
+                        <li>Choose <strong>Cancel</strong>. Keep the confirmation email.</li>
+                    </ol>
+                </details>
+                <details class="pay-route">
+                    <summary>By Direct Debit, or it's a phone, TV or broadband contract</summary>
+                    <ol class="steps">
+                        <li>Contact {{ subscription.name }} and ask to cancel. Contracts can have a minimum term or a notice period.</li>
+                        <li>Ask them to confirm the cancellation in writing or by email.</li>
+                        <li>Only cancel the Direct Debit with your bank once they've confirmed. Cancelling the Direct Debit on its own doesn't end a contract.</li>
+                    </ol>
+                </details>
+            {% endif %}
+        {% endwith %}
+
+        <div class="done-box">
+            <h2>Done it?</h2>
+            <p>We'll take {{ subscription.name }} off your totals{% if subscription.price %} and remind you to check you weren't charged again{% endif %}.</p>
+            <form method="post" action="{% url 'mark_cancelled' subscription.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="button">I've cancelled {{ subscription.name }}</button>
+            </form>
+        </div>
+
+        <p><a href="{% url 'home' %}">Back to my wheel</a></p>
+    </section>
+{% endblock content %}

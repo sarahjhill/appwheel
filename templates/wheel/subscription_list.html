@@ -66,6 +66,7 @@
                                 <p class="app-meta">Free trial ends {{ subscription.trial_end_date|date:"j M Y" }}</p>
                             {% endif %}
                             <p class="app-actions">
+                                {% if subscription.price %}<a href="{% url 'cancel_help' subscription.pk %}">Cancel<span class="visually-hidden"> {{ subscription.name }}</span> with help</a>{% endif %}
                                 <a href="{% url 'subscription_edit' subscription.pk %}">Edit<span class="visually-hidden"> {{ subscription.name }}</span></a>
                                 <a href="{% url 'subscription_delete' subscription.pk %}">Remove<span class="visually-hidden"> {{ subscription.name }}</span></a>
                             </p>
@@ -81,10 +82,35 @@
                     </li>
                 {% endfor %}
             </ul>
-        {% else %}
+        {% elif not cancelled %}
             <p>You haven't added any apps yet. The quickest way is to upload your bank statements and we'll find them for you.</p>
         {% endif %}
 
-        <p><a href="{% url 'home' %}">Back to home</a></p>
+        {% if cancelled %}
+            <h2 class="section-heading">Cancelled</h2>
+            <ul class="app-list">
+                {% for subscription in cancelled %}
+                    <li class="app-item is-cancelled">
+                        <div>
+                            <h3 class="app-name">{{ subscription.name }}</h3>
+                            <p class="app-meta">Cancelled {{ subscription.cancelled_on|date:"j M Y" }}</p>
+                            {% if subscription.check_date %}
+                                <p class="app-meta">We'll remind you on {{ subscription.check_date|date:"j M" }} to check you weren't charged.</p>
+                            {% endif %}
+                            <div class="app-actions">
+                                {% if subscription.price %}<a href="{% url 'refund_request' subscription.pk %}">Charged after cancelling?</a>{% endif %}
+                                <form method="post" action="{% url 'mark_active' subscription.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="link-button">Put back on my wheel<span class="visually-hidden">: {{ subscription.name }}</span></button>
+                                </form>
+                            </div>
+                        </div>
+                        <p class="app-price">£{{ subscription.price|floatformat:"2g" }}<span>was {{ subscription.get_billing_period_display|lower }}</span></p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <p><a href="{% url 'home' %}">Back to my wheel</a></p>
     </section>
 {% endblock content %}

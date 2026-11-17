@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -5,6 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from . import screenshot
 from .health import summarise
 from .forms import ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
+from reminders.models import Reminder
+
 from .models import CommonApp, Subscription
 from .statement import StatementError, find_regular_payments, read_statement
 
@@ -15,11 +19,20 @@ SESSION_KEY = 'statement_found'
 @login_required
 def subscription_list(request):
     """Show the apps that belong to the signed-in user, and nobody else's."""
-    subscriptions = list(
+    everything = list(
         request.user.subscriptions.select_related('common_app').prefetch_related('common_app__plans')
     )
+    subscriptions = [sub for sub in everything if sub.status == Subscription.Status.ACTIVE]
+    cancelled = [sub for sub in everything if sub.status == Subscription.Status.CANCELLED]
+    check_dates = {
+        reminder.subscription_id: reminder.due_date
+        for reminder in request.user.reminders.filter(kind=Reminder.Kind.CHARGE_CHECK, is_done=False)
+    }
+    for sub in cancelled:
+        sub.check_date = check_dates.get(sub.pk)
     return render(request, 'wheel/subscription_list.html', {
         'subscriptions': subscriptions,
+        'cancelled': cancelled,
         'summary': summarise(subscriptions),
         'screenshots_ready': screenshot.is_set_up(),
     })
@@ -202,3 +215,76 @@ def screenshot_upload(request):
         'form': form,
         'is_set_up': screenshot.is_set_up(),
     })
+
+
+@login_required
+def cancel_help(request, pk):
+    """Help to cancel an app: the company's cancel page and simple steps."""
+    subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
+    return render(request, 'wheel/cancel_help.html', {'subscription': subscription})
+
+
+def charge_check_date(subscription, today):
+    """The day after the next payment would have been taken."""
+    if subscription.next_payment_date and subscription.next_payment_date >= today:
+        return subscription.next_payment_date + timedelta(days=1)
+    days = {'weekly': 7, 'yearly': 30}.get(subscription.billing_period, 30)
+    return today + timedelta(days=days)
+
+
+@login_required
+def mark_cancelled(request, pk):
+    """'I've cancelled': take it off the totals and set a reminder to check for charges."""
+    subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
+    if request.method != 'POST':
+        return redirect('cancel_help', pk=pk)
+    today = date.today()
+    subscription.status = Subscription.Status.CANCELLED
+    subscription.cancelled_on = today
+    subscription.save()
+
+    check_on = charge_check_date(subscription, today)
+    if subscription.price:
+        Reminder.objects.update_or_create(
+            user=request.user,
+            subscription=subscription,
+            kind=Reminder.Kind.CHARGE_CHECK,
+            is_done=False,
+            defaults={
+                'title': f'Check you weren\'t charged by {subscription.name}',
+                'details': (
+                    f'You cancelled {subscription.name} on {today:%d %B %Y}. '
+                    'Look at your bank statement or app store receipts. '
+                    'If you were charged, AppWheel has a refund request ready for you.'
+                ),
+                'due_date': check_on,
+            },
+        )
+        messages.success(
+            request,
+            f'{subscription.name} is cancelled and off your totals. '
+            f'We\'ll remind you on {check_on.day} {check_on:%B} to check you weren\'t charged.',
+        )
+    else:
+        messages.success(request, f'{subscription.name} is cancelled and off your wheel.')
+    return redirect('subscription_list')
+
+
+@login_required
+def mark_active(request, pk):
+    """Undo 'I've cancelled', for example if it was pressed by mistake."""
+    subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
+    if request.method == 'POST':
+        subscription.status = Subscription.Status.ACTIVE
+        subscription.cancelled_on = None
+        subscription.save()
+        subscription.reminders.filter(kind=Reminder.Kind.CHARGE_CHECK, is_done=False).delete()
+        messages.success(request, f'{subscription.name} is back on your wheel.')
+    return redirect('subscription_list')
+
+
+@login_required
+def refund_request(request, pk):
+    """A ready-written refund request for a payment taken after cancelling."""
+    subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
+    return render(request, 'wheel/refund_request.html', {'subscription': subscription})

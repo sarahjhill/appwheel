@@ -123,7 +123,8 @@
                     {% endif %}
 
                     <div class="button-row">
-                        <a class="button" href="{% url 'subscription_edit' app.pk %}">Edit details</a>
+                        {% if app.price %}<a class="button" href="{% url 'cancel_help' app.pk %}">Cancel with help</a>{% endif %}
+                        <a class="button button-secondary" href="{% url 'subscription_edit' app.pk %}">Edit details</a>
                         <a class="button button-secondary" href="{% url 'subscription_delete' app.pk %}">Remove</a>
                     </div>
                 </dialog>

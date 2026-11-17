@@ -379,3 +379,23 @@ input[type="search"] {
 @media (prefers-reduced-motion: reduce) {
     .wheel-ring, .wheel-app-face { transition: none; }
 }
+
+/* Cancel with help */
+.steps { padding-left: 1.4rem; margin: 0.5rem 0 1rem; }
+.steps li { margin: 0.4rem 0; }
+.pay-route { margin: 0.6rem 0; border: 1px solid var(--line); border-radius: 0.9rem; background: #1b1636; }
+.pay-route summary { cursor: pointer; padding: 0.8rem 1rem; font-weight: 700; min-height: 3rem; }
+.pay-route[open] summary { border-bottom: 1px solid var(--line); }
+.pay-route .steps { margin: 0.75rem 1rem 1rem; }
+.done-box { margin: 1.5rem 0 1rem; padding: 1rem; border-radius: 1rem; background: #123d2b; border: 1px solid #2f7d57; }
+.done-box h2 { margin-top: 0; }
+.done-box .button { margin-top: 0.5rem; }
+.section-heading { margin-top: 2rem; }
+.is-cancelled { opacity: 0.85; }
+.app-actions { align-items: center; flex-wrap: wrap; }
+.app-actions form { margin: 0; }
+.app-actions .link-button { padding: 0; font-size: 1rem; }
+.refund-text {
+    width: 100%; padding: 0.9rem 1rem; border-radius: 0.75rem; border: 1px solid #4a4170;
+    background: #1b1636; color: var(--text); font: inherit; font-size: 0.95rem; line-height: 1.5;
+}

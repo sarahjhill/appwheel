@@ -40,6 +40,10 @@ class CommonApp(models.Model):
     category = models.CharField(max_length=20, choices=Category.choices, default=Category.OTHER)
     cancel_url = models.URLField('cancel page', blank=True, help_text='The page where people cancel.')
     help_url = models.URLField('help page', blank=True)
+    cancel_steps = models.TextField(
+        blank=True,
+        help_text='Simple steps to cancel, one per line. Check them on the company\'s own help page.',
+    )
 
     class Meta:
         ordering = ['name']
@@ -133,6 +137,7 @@ class Subscription(models.Model):
     status = models.CharField(
         max_length=10, choices=Status.choices, default=Status.ACTIVE,
     )
+    cancelled_on = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -150,3 +155,9 @@ class Subscription(models.Model):
     @property
     def yearly_cost(self):
         return (self.monthly_cost * 12).quantize(Decimal('0.01'))
+
+    @property
+    def cancel_step_list(self):
+        if self.common_app and self.common_app.cancel_steps:
+            return [step.strip() for step in self.common_app.cancel_steps.splitlines() if step.strip()]
+        return []
