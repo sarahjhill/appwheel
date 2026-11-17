@@ -5,6 +5,26 @@
         {% if subscription %}
             <h1>Edit {{ subscription.name }}</h1>
             <p class="lead">Change any details, then save.</p>
+        {% elif common_app %}
+            <h1>Add {{ common_app.name }}</h1>
+            {% if common_app.plans.all %}
+                <h2>Which plan are you on?</h2>
+                <ul class="plan-list">
+                    {% for plan in common_app.plans.all %}
+                        <li>
+                            <a class="plan-choice{% if plan == chosen_plan %} is-chosen{% endif %}"
+                               href="?app={{ common_app.slug }}&amp;plan={{ plan.pk }}"
+                               {% if plan == chosen_plan %}aria-current="true"{% endif %}>
+                                <span>{{ plan.name }}</span>
+                                <span>£{{ plan.price }} {{ plan.get_billing_period_display|lower }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="help-text">Choosing a plan fills in the price for you. You can still change anything below.</p>
+            {% else %}
+                <p class="lead">Fill in the price and how often you pay.</p>
+            {% endif %}
         {% else %}
             <h1>Add an app</h1>
             <p class="lead">Add an app or subscription you pay for, or a free one you use.</p>
@@ -13,7 +33,8 @@
         <form method="post" novalidate>
             {% csrf_token %}
             {{ form.non_field_errors }}
-            {% for field in form %}
+            {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+            {% for field in form.visible_fields %}
                 <div class="field">
                     <label for="{{ field.id_for_label }}">
                         {{ field.label|capfirst }}{% if not field.field.required %} <span class="optional">(optional)</span>{% endif %}
@@ -28,6 +49,9 @@
             <button type="submit" class="button">{% if subscription %}Save changes{% else %}Add app{% endif %}</button>
         </form>
 
+        {% if not subscription %}
+            <p><a href="{% url 'subscription_add' %}">Choose a different app</a></p>
+        {% endif %}
         <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
     </section>
 {% endblock content %}

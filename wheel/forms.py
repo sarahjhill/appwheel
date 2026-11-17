@@ -15,10 +15,11 @@ class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Subscription
         fields = [
-            'name', 'plan_name', 'category', 'price', 'billing_period',
+            'common_app', 'name', 'plan_name', 'category', 'price', 'billing_period',
             'next_payment_date', 'trial_end_date', 'usage', 'benefits',
         ]
         widgets = {
+            'common_app': forms.HiddenInput(),
             'price': forms.NumberInput(attrs={'step': '0.01', 'min': '0', 'inputmode': 'decimal'}),
             'next_payment_date': DateInput(),
             'trial_end_date': DateInput(),

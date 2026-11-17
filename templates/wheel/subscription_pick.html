@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block head_title %}Add an app{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Add an app</h1>
+        <p class="lead">Find your app and we'll fill in the details.</p>
+
+        <form method="get" role="search" class="search-form">
+            <label for="q">Search for an app</label>
+            <div class="search-row">
+                <input type="search" id="q" name="q" value="{{ query }}" placeholder="For example Netflix" autocomplete="off">
+                <button type="submit" class="button">Search</button>
+            </div>
+        </form>
+
+        {% if common_apps %}
+            <h2>{% if query %}Apps matching "{{ query }}"{% else %}Popular apps{% endif %}</h2>
+            <ul class="pick-list">
+                {% for common_app in common_apps %}
+                    <li>
+                        <a class="pick-choice" href="?app={{ common_app.slug }}">
+                            <span class="pick-name">{{ common_app.name }}</span>
+                            <span class="app-meta">{{ common_app.get_category_display }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>We couldn't find "{{ query }}" in our list.</p>
+        {% endif %}
+
+        <p><a class="button button-secondary" href="?own=1">My app isn't listed, I'll type it</a></p>
+        <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}

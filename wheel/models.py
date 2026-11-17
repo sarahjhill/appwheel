@@ -5,23 +5,64 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 
+class Category(models.TextChoices):
+    MUSIC = 'music', 'Music'
+    VIDEO = 'video', 'TV and video'
+    AI = 'ai', 'AI tools'
+    STORAGE = 'storage', 'Cloud storage'
+    BOOKS = 'books', 'Books and audiobooks'
+    DESIGN = 'design', 'Design'
+    FITNESS = 'fitness', 'Health and fitness'
+    OTHER = 'other', 'Other'
+
+
+class BillingPeriod(models.TextChoices):
+    WEEKLY = 'weekly', 'Every week'
+    MONTHLY = 'monthly', 'Every month'
+    YEARLY = 'yearly', 'Every year'
+
+
+class CommonApp(models.Model):
+    """A well-known app, like Netflix. Managed in the admin, shared by everyone."""
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    category = models.CharField(max_length=20, choices=Category.choices, default=Category.OTHER)
+    cancel_url = models.URLField('cancel page', blank=True, help_text='The page where people cancel.')
+    help_url = models.URLField('help page', blank=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class CommonAppPlan(models.Model):
+    """One plan for a common app, like Netflix Standard at £12.99 a month."""
+
+    common_app = models.ForeignKey(CommonApp, on_delete=models.CASCADE, related_name='plans')
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(
+        'price (£)', max_digits=8, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0'))],
+    )
+    billing_period = models.CharField(
+        max_length=10, choices=BillingPeriod.choices, default=BillingPeriod.MONTHLY,
+    )
+
+    class Meta:
+        ordering = ['price']
+
+    def __str__(self):
+        return f'{self.common_app.name} {self.name}'
+
+
 class Subscription(models.Model):
     """One app or subscription that a user pays for (or uses for free)."""
 
-    class Category(models.TextChoices):
-        MUSIC = 'music', 'Music'
-        VIDEO = 'video', 'TV and video'
-        AI = 'ai', 'AI tools'
-        STORAGE = 'storage', 'Cloud storage'
-        BOOKS = 'books', 'Books and audiobooks'
-        DESIGN = 'design', 'Design'
-        FITNESS = 'fitness', 'Health and fitness'
-        OTHER = 'other', 'Other'
-
-    class BillingPeriod(models.TextChoices):
-        WEEKLY = 'weekly', 'Every week'
-        MONTHLY = 'monthly', 'Every month'
-        YEARLY = 'yearly', 'Every year'
+    Category = Category
+    BillingPeriod = BillingPeriod
 
     class Usage(models.TextChoices):
         DAILY = 'daily', 'Every day'
@@ -37,6 +78,10 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name='subscriptions',
+    )
+    common_app = models.ForeignKey(
+        CommonApp, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='subscriptions',
     )
     name = models.CharField('app name', max_length=100)

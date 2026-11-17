@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from . import screenshot
 from .forms import ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
-from .models import Subscription
+from .models import CommonApp, Subscription
 from .statement import StatementError, find_regular_payments, read_statement
 
 # Where the payments we found are kept between the upload and review pages
@@ -23,7 +23,10 @@ def subscription_list(request):
 
 @login_required
 def subscription_add(request):
-    """Add a new app or subscription for the signed-in user."""
+    """
+    Add a new app. First pick a common app (or choose to type your own),
+    then fill in the form. Picking a common app and plan fills it in for you.
+    """
     if request.method == 'POST':
         form = SubscriptionForm(request.POST)
         if form.is_valid():
@@ -32,9 +35,44 @@ def subscription_add(request):
             subscription.save()
             messages.success(request, f'{subscription.name} has been added.')
             return redirect('subscription_list')
-    else:
-        form = SubscriptionForm()
-    return render(request, 'wheel/subscription_form.html', {'form': form})
+        return render(request, 'wheel/subscription_form.html', {'form': form})
+
+    slug = request.GET.get('app')
+    if not slug and not request.GET.get('own'):
+        return _pick_an_app(request)
+
+    common_app, chosen_plan, initial = None, None, {}
+    if slug:
+        common_app = get_object_or_404(CommonApp, slug=slug)
+        initial = {
+            'common_app': common_app.pk,
+            'name': common_app.name,
+            'category': common_app.category,
+        }
+        chosen_plan = common_app.plans.filter(pk=request.GET.get('plan') or 0).first()
+        if chosen_plan:
+            initial.update({
+                'plan_name': chosen_plan.name,
+                'price': chosen_plan.price,
+                'billing_period': chosen_plan.billing_period,
+            })
+    return render(request, 'wheel/subscription_form.html', {
+        'form': SubscriptionForm(initial=initial),
+        'common_app': common_app,
+        'chosen_plan': chosen_plan,
+    })
+
+
+def _pick_an_app(request):
+    """Step 1 of adding an app: search the list of common apps."""
+    query = request.GET.get('q', '').strip()
+    common_apps = CommonApp.objects.all()
+    if query:
+        common_apps = common_apps.filter(name__icontains=query)
+    return render(request, 'wheel/subscription_pick.html', {
+        'common_apps': common_apps,
+        'query': query,
+    })
 
 
 @login_required
@@ -116,6 +154,7 @@ def statement_review(request):
             if str(index) in ticked and not item['already_added']:
                 Subscription.objects.create(
                     user=request.user,
+                    common_app=CommonApp.objects.filter(name__iexact=item['name']).first(),
                     name=item['name'],
                     plan_name=item.get('plan_name', ''),
                     category=item['category'],

@@ -201,3 +201,26 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
     overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
+
+/* Choosing a common app and plan */
+input[type="search"] {
+    width: 100%; min-height: 3rem; padding: 0.6rem 1rem; border-radius: 0.75rem;
+    border: 1px solid #4a4170; background: #1b1636; color: var(--text); font: inherit;
+}
+.search-row { display: flex; gap: 0.5rem; align-items: center; }
+.search-row .button { margin-top: 0; flex-shrink: 0; }
+.pick-list {
+    list-style: none; padding: 0; margin: 1rem 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.6rem;
+}
+.pick-choice, .plan-choice {
+    display: flex; flex-direction: column; gap: 0.15rem; min-height: 3rem;
+    padding: 0.7rem 0.9rem; border-radius: 0.75rem; border: 1px solid #4a4170;
+    background: #1b1636; color: var(--text); text-decoration: none;
+}
+.pick-choice:hover, .plan-choice:hover { border-color: var(--accent); color: var(--text); }
+.pick-name { font-weight: 800; }
+.plan-list { list-style: none; padding: 0; margin: 0.75rem 0; display: grid; gap: 0.5rem; }
+.plan-choice { flex-direction: row; justify-content: space-between; font-weight: 700; }
+.plan-choice.is-chosen { border: 2px solid var(--accent); background: #2a2252; }
+.plan-choice.is-chosen::after { content: " ✓"; }

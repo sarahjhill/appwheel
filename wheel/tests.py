@@ -44,7 +44,7 @@ class AddAppTests(TestCase):
         self.client.force_login(self.user)
 
     def test_add_page_shows_the_form(self):
-        response = self.client.get(reverse('subscription_add'))
+        response = self.client.get(reverse('subscription_add'), {'own': '1'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Add an app')
 
@@ -148,3 +148,51 @@ class EditAndRemoveTests(TestCase):
         response = self.client.post(reverse('subscription_delete', args=[self.theirs.pk]))
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Subscription.objects.filter(pk=self.theirs.pk).exists())
+
+
+class CommonAppTests(TestCase):
+    def setUp(self):
+        from .models import CommonApp
+        self.user = make_user('sam')
+        self.client.force_login(self.user)
+        self.netflix = CommonApp.objects.get(name='Netflix')  # from the starter list
+        self.standard = self.netflix.plans.create(name='Standard', price=Decimal('12.99'), billing_period='monthly')
+
+    def test_add_starts_with_a_list_of_common_apps(self):
+        response = self.client.get(reverse('subscription_add'))
+        self.assertContains(response, 'Popular apps')
+        self.assertContains(response, 'Netflix')
+        self.assertContains(response, 'Spotify')
+
+    def test_searching_shows_matching_apps(self):
+        response = self.client.get(reverse('subscription_add'), {'q': 'spot'})
+        self.assertContains(response, '?app=spotify')
+        self.assertNotContains(response, '?app=netflix')
+
+    def test_choosing_an_app_fills_in_name_and_category_and_shows_plans(self):
+        response = self.client.get(reverse('subscription_add'), {'app': 'netflix'})
+        self.assertContains(response, 'Add Netflix')
+        self.assertContains(response, 'value="Netflix"')
+        self.assertContains(response, '<option value="video" selected>')
+        self.assertContains(response, 'Which plan are you on?')
+        self.assertContains(response, 'Standard')
+
+    def test_choosing_a_plan_fills_in_the_price(self):
+        response = self.client.get(reverse('subscription_add'), {'app': 'netflix', 'plan': self.standard.pk})
+        self.assertContains(response, 'value="12.99"')
+        self.assertContains(response, 'value="Standard"')
+
+    def test_saving_links_the_app_to_the_common_app(self):
+        data = valid_form_data(common_app=self.netflix.pk)
+        self.client.post(reverse('subscription_add'), data)
+        self.assertEqual(Subscription.objects.get().common_app, self.netflix)
+
+    def test_i_can_still_type_my_own_app(self):
+        response = self.client.get(reverse('subscription_add'), {'own': '1'})
+        self.assertContains(response, '<h1>Add an app</h1>', html=False)
+        self.client.post(reverse('subscription_add'), valid_form_data(name='My Local Gym'))
+        self.assertIsNone(Subscription.objects.get().common_app)
+
+    def test_an_unknown_app_gives_not_found(self):
+        response = self.client.get(reverse('subscription_add'), {'app': 'not-an-app'})
+        self.assertEqual(response.status_code, 404)
