@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block head_title %}Remove {{ subscription.name }}{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Remove {{ subscription.name }}?</h1>
+        <p>This removes {{ subscription.name }} from AppWheel. It doesn't cancel your subscription with {{ subscription.name }}. You'll still be charged until you cancel it with them.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="button button-danger">Yes, remove it</button>
+        </form>
+        <p><a href="{% url 'subscription_list' %}">No, keep it</a></p>
+    </section>
+{% endblock content %}

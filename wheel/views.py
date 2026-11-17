@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from . import screenshot
 from .forms import ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
@@ -35,6 +35,38 @@ def subscription_add(request):
     else:
         form = SubscriptionForm()
     return render(request, 'wheel/subscription_form.html', {'form': form})
+
+
+@login_required
+def subscription_edit(request, pk):
+    """Change one of my apps. Other people's apps give a 'not found' page."""
+    subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = SubscriptionForm(request.POST, instance=subscription)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'{subscription.name} has been updated.')
+            return redirect('subscription_list')
+    else:
+        form = SubscriptionForm(instance=subscription)
+    return render(request, 'wheel/subscription_form.html', {
+        'form': form,
+        'subscription': subscription,
+    })
+
+
+@login_required
+def subscription_delete(request, pk):
+    """Remove one of my apps, after asking 'are you sure?'."""
+    subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
+    if request.method == 'POST':
+        name = subscription.name
+        subscription.delete()
+        messages.success(request, f'{name} has been removed.')
+        return redirect('subscription_list')
+    return render(request, 'wheel/subscription_confirm_delete.html', {
+        'subscription': subscription,
+    })
 
 
 @login_required

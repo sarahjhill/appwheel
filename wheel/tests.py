@@ -95,3 +95,56 @@ class OnlyMyAppsTests(TestCase):
         self.client.force_login(me)
         self.client.post(reverse('subscription_add'), valid_form_data(user=someone_else.pk))
         self.assertEqual(Subscription.objects.get().user, me)
+
+
+class EditAndRemoveTests(TestCase):
+    def setUp(self):
+        self.me = make_user('sam')
+        self.someone_else = make_user('alex')
+        self.mine = Subscription.objects.create(user=self.me, name='Netflix', price=Decimal('12.99'))
+        self.theirs = Subscription.objects.create(user=self.someone_else, name='Disney+', price=Decimal('4.99'))
+        self.client.force_login(self.me)
+
+    def test_my_apps_list_has_edit_and_remove_links(self):
+        response = self.client.get(reverse('subscription_list'))
+        self.assertContains(response, reverse('subscription_edit', args=[self.mine.pk]))
+        self.assertContains(response, reverse('subscription_delete', args=[self.mine.pk]))
+
+    def test_i_can_edit_any_detail_of_my_app(self):
+        response = self.client.get(reverse('subscription_edit', args=[self.mine.pk]))
+        self.assertContains(response, 'Edit Netflix')
+        self.assertContains(response, 'value="12.99"')
+
+        response = self.client.post(
+            reverse('subscription_edit', args=[self.mine.pk]),
+            valid_form_data(price='15.99', plan_name='Premium'),
+        )
+        self.assertRedirects(response, reverse('subscription_list'))
+        self.mine.refresh_from_db()
+        self.assertEqual(self.mine.price, Decimal('15.99'))
+        self.assertEqual(self.mine.plan_name, 'Premium')
+
+    def test_i_cannot_edit_someone_elses_app(self):
+        response = self.client.get(reverse('subscription_edit', args=[self.theirs.pk]))
+        self.assertEqual(response.status_code, 404)
+        response = self.client.post(
+            reverse('subscription_edit', args=[self.theirs.pk]), valid_form_data(name='Hacked')
+        )
+        self.assertEqual(response.status_code, 404)
+        self.theirs.refresh_from_db()
+        self.assertEqual(self.theirs.name, 'Disney+')
+
+    def test_remove_asks_me_to_confirm_first(self):
+        response = self.client.get(reverse('subscription_delete', args=[self.mine.pk]))
+        self.assertContains(response, 'Remove Netflix?')
+        self.assertTrue(Subscription.objects.filter(pk=self.mine.pk).exists())
+
+    def test_i_can_remove_my_app_after_confirming(self):
+        response = self.client.post(reverse('subscription_delete', args=[self.mine.pk]))
+        self.assertRedirects(response, reverse('subscription_list'))
+        self.assertFalse(Subscription.objects.filter(pk=self.mine.pk).exists())
+
+    def test_i_cannot_remove_someone_elses_app(self):
+        response = self.client.post(reverse('subscription_delete', args=[self.theirs.pk]))
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Subscription.objects.filter(pk=self.theirs.pk).exists())

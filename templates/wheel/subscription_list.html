@@ -27,6 +27,10 @@
                             {% if subscription.trial_end_date %}
                                 <p class="app-meta">Free trial ends {{ subscription.trial_end_date|date:"j M Y" }}</p>
                             {% endif %}
+                            <p class="app-actions">
+                                <a href="{% url 'subscription_edit' subscription.pk %}">Edit<span class="visually-hidden"> {{ subscription.name }}</span></a>
+                                <a href="{% url 'subscription_delete' subscription.pk %}">Remove<span class="visually-hidden"> {{ subscription.name }}</span></a>
+                            </p>
                         </div>
                         <p class="app-price">
                             {% if subscription.price %}
