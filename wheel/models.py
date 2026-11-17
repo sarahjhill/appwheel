@@ -22,6 +22,16 @@ class BillingPeriod(models.TextChoices):
     YEARLY = 'yearly', 'Every year'
 
 
+def to_monthly(price, billing_period):
+    """Turn a weekly, monthly or yearly price into a price per month."""
+    price = Decimal(price)
+    if billing_period == BillingPeriod.WEEKLY:
+        price = price * 52 / 12
+    elif billing_period == BillingPeriod.YEARLY:
+        price = price / 12
+    return price.quantize(Decimal('0.01'))
+
+
 class CommonApp(models.Model):
     """A well-known app, like Netflix. Managed in the admin, shared by everyone."""
 
@@ -56,6 +66,10 @@ class CommonAppPlan(models.Model):
 
     def __str__(self):
         return f'{self.common_app.name} {self.name}'
+
+    @property
+    def monthly_cost(self):
+        return to_monthly(self.price, self.billing_period)
 
 
 class Subscription(models.Model):
@@ -127,3 +141,12 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.user})'
+
+    @property
+    def monthly_cost(self):
+        """What this costs in an average month, whether paid weekly, monthly or yearly."""
+        return to_monthly(self.price, self.billing_period)
+
+    @property
+    def yearly_cost(self):
+        return (self.monthly_cost * 12).quantize(Decimal('0.01'))

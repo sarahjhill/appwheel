@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from . import screenshot
+from .health import summarise
 from .forms import ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
 from .models import CommonApp, Subscription
 from .statement import StatementError, find_regular_payments, read_statement
@@ -14,9 +15,12 @@ SESSION_KEY = 'statement_found'
 @login_required
 def subscription_list(request):
     """Show the apps that belong to the signed-in user, and nobody else's."""
-    subscriptions = request.user.subscriptions.all()
+    subscriptions = list(
+        request.user.subscriptions.select_related('common_app').prefetch_related('common_app__plans')
+    )
     return render(request, 'wheel/subscription_list.html', {
         'subscriptions': subscriptions,
+        'summary': summarise(subscriptions),
         'screenshots_ready': screenshot.is_set_up(),
     })
 

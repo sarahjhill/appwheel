@@ -13,11 +13,49 @@
         </div>
 
         {% if subscriptions %}
+            <div class="totals" aria-label="Your totals">
+                <p class="total">
+                    <span class="total-label">You spend</span>
+                    <span class="total-amount">£{{ summary.monthly_total }}</span>
+                    <span class="total-label">a month · £{{ summary.yearly_total }} a year</span>
+                </p>
+                {% if summary.possible_yearly_saving %}
+                    <p class="total total-saving">
+                        <span class="total-label">You could save up to</span>
+                        <span class="total-amount">£{{ summary.possible_yearly_saving }}</span>
+                        <span class="total-label">a year</span>
+                    </p>
+                {% endif %}
+                <p class="light-counts">
+                    <span class="light light-green"><span aria-hidden="true">✓</span> {{ summary.counts.green }} good value</span>
+                    <span class="light light-amber"><span aria-hidden="true">!</span> {{ summary.counts.amber }} could cost less</span>
+                    <span class="light light-red"><span aria-hidden="true">✕</span> {{ summary.counts.red }} need{{ summary.counts.red|pluralize:"s," }} action</span>
+                </p>
+            </div>
+
             <ul class="app-list">
                 {% for subscription in subscriptions %}
                     <li class="app-item">
                         <div>
                             <h2 class="app-name">{{ subscription.name }}</h2>
+                            {% if subscription.health %}
+                                <p class="light light-{{ subscription.health.light }}">
+                                    <span aria-hidden="true">{{ subscription.health.symbol }}</span>
+                                    {{ subscription.health.label }}
+                                    <span class="score">{{ subscription.health.score }}/100</span>
+                                </p>
+                                <p class="health-reason">{{ subscription.health.reason }}</p>
+                                {% if subscription.health.tips %}
+                                    <div class="ways-to-save">
+                                        <h3>Ways to save</h3>
+                                        <ul>
+                                            {% for tip in subscription.health.tips %}
+                                                <li>{{ tip.text }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
                             <p class="app-meta">
                                 {% if subscription.plan_name %}{{ subscription.plan_name }} · {% endif %}{{ subscription.get_category_display }}
                             </p>

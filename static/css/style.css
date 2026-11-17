@@ -224,3 +224,27 @@ input[type="search"] {
 .plan-choice { flex-direction: row; justify-content: space-between; font-weight: 700; }
 .plan-choice.is-chosen { border: 2px solid var(--accent); background: #2a2252; }
 .plan-choice.is-chosen::after { content: " ✓"; }
+
+/* Totals and health lights */
+.totals {
+    display: grid; gap: 0.75rem; margin: 1.25rem 0; padding: 1rem;
+    border-radius: 1rem; background: #1b1636; border: 1px solid #3a3260;
+}
+.total { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem; }
+.total-amount { font-size: 1.75rem; font-weight: 800; }
+.total-label { color: #b8b0d9; font-weight: 600; }
+.total-saving .total-amount { color: var(--green); }
+.light-counts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.light {
+    display: inline-flex; align-items: center; gap: 0.35rem; margin: 0.25rem 0;
+    padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.85rem; font-weight: 800;
+    border: 2px solid currentColor;
+}
+.light-green { color: var(--green); }
+.light-amber { color: var(--amber); }
+.light-red { color: var(--red); }
+.score { font-weight: 600; opacity: 0.85; }
+.health-reason { margin: 0.35rem 0; }
+.ways-to-save { margin: 0.5rem 0; padding: 0.5rem 0.75rem; border-left: 3px solid var(--green); background: #1b1636; border-radius: 0.5rem; }
+.ways-to-save h3 { margin: 0 0 0.25rem; font-size: 0.9rem; }
+.ways-to-save ul { margin: 0; padding-left: 1.1rem; }
