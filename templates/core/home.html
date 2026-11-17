@@ -1,12 +1,149 @@
 {% extends "base.html" %}
-{% block head_title %}Home{% endblock head_title %}
+{% load static %}
+{% block head_title %}My App Wheel{% endblock head_title %}
 {% block content %}
-    <section class="card">
-        <h1>Welcome to AppWheel</h1>
-        <p class="lead">Spins all your apps into control.</p>
-        <p>You're signed in as <strong>{{ user.email }}</strong>.</p>
-        <p><a class="button" href="{% url 'subscription_list' %}">My apps</a></p>
-        <p>The App Wheel is coming soon. For now, add the apps you pay for and see them in a list.</p>
+    {% if apps %}
+        <section class="wheel-page" aria-labelledby="wheel-heading">
+            <h1 id="wheel-heading" class="visually-hidden">My App Wheel</h1>
+
+            <div class="spend-card">
+                <div>
+                    <p class="spend-label">You spend</p>
+                    <p class="spend-amount">£{{ summary.monthly_total|floatformat:"2g" }}<span> a month</span></p>
+                    <p class="spend-label">£{{ summary.yearly_total|floatformat:"2g" }} a year on {{ paid_count }} paid app{{ paid_count|pluralize }}</p>
+                </div>
+                {% if summary.possible_yearly_saving %}
+                    <div class="save-box">
+                        <p>You could save</p>
+                        <p class="save-amount">£{{ summary.possible_yearly_saving|floatformat:"2g" }}</p>
+                        <p>a year</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="wheel{% if apps|length > 8 %} wheel-crowded{% endif %}" data-wheel>
+                <svg class="wheel-pointer" width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><path d="M10 14L0 0h20z" fill="currentColor"></path></svg>
+                <div class="wheel-area">
+                    <div class="wheel-track" aria-hidden="true"></div>
+                    <ul class="wheel-ring" data-ring aria-label="Your apps. Choose one to see its details.">
+                        {% for app in apps %}
+                            <li class="wheel-slot" style="--angle: {{ app.angle }}deg">
+                                <button type="button" class="wheel-app light-border-{{ app.health.light }}"
+                                        data-index="{{ forloop.counter0 }}" data-card="card-{{ app.pk }}"
+                                        data-name="{{ app.name }}" data-light="{{ app.health.light }}" data-label="{{ app.health.label }}"
+                                        data-price="{% if app.price %}£{{ app.monthly_cost|floatformat:"2g" }} / month{% else %}Free app{% endif %}"
+                                        aria-label="{{ app.name }}, {% if app.price %}£{{ app.monthly_cost|floatformat:"2g" }} a month{% else %}free{% endif %}, {{ app.health.label|lower }}">
+                                    <span class="wheel-app-face">
+                                        <span class="wheel-app-name">{{ app.short_name }}</span>
+                                        <span class="wheel-badge badge-{{ app.health.light }}" aria-hidden="true">{{ app.health.symbol }}</span>
+                                    </span>
+                                </button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" class="wheel-centre" data-centre aria-describedby="wheel-selected">
+                        <span id="wheel-selected" aria-live="polite">
+                            {% with first=apps.0 %}
+                                <span class="centre-name" data-centre-name>{{ first.name }}</span>
+                                <span class="centre-price" data-centre-price>{% if first.price %}£{{ first.monthly_cost|floatformat:"2g" }} / month{% else %}Free app{% endif %}</span>
+                                <span class="centre-pill badge-{{ first.health.light }}" data-centre-pill>{{ first.health.label }}</span>
+                            {% endwith %}
+                        </span>
+                        <span class="centre-hint">Tap for details</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="wheel-controls">
+                <button type="button" class="round-button" data-turn="-1" aria-label="Turn wheel left">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </button>
+                <button type="button" class="button spin-button" data-spin>Spin the wheel</button>
+                <button type="button" class="round-button" data-turn="1" aria-label="Turn wheel right">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </button>
+            </div>
+
+            <p class="wheel-key">
+                <span><span class="key-dot badge-green" aria-hidden="true">✓</span>Good value</span>
+                <span><span class="key-dot badge-amber" aria-hidden="true">!</span>Could cost less</span>
+                <span><span class="key-dot badge-red" aria-hidden="true">✕</span>Needs action</span>
+            </p>
+
+            {% if hidden_count %}
+                <p class="help-text wheel-more">Showing your {{ apps|length }} biggest costs. {{ hidden_count }} more in <a href="{% url 'subscription_list' %}">My apps</a>.</p>
+            {% endif %}
+
+            <div class="button-row wheel-links">
+                <a class="button button-secondary" href="{% url 'subscription_list' %}">See as a list</a>
+                <a class="button button-secondary" href="{% url 'statement_upload' %}">Add apps</a>
+            </div>
+
+            {% for app in apps %}
+                <dialog class="app-card" id="card-{{ app.pk }}" aria-labelledby="card-{{ app.pk }}-title">
+                    <div class="card-head">
+                        <span class="card-tile light-border-{{ app.health.light }}" aria-hidden="true">{{ app.short_name }}</span>
+                        <div class="card-title">
+                            <h2 id="card-{{ app.pk }}-title">{{ app.name }}</h2>
+                            <p>{% if app.plan_name %}{{ app.plan_name }} · {% endif %}{{ app.get_category_display }}</p>
+                        </div>
+                        <form method="dialog"><button class="close-button" aria-label="Close">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg>
+                        </button></form>
+                    </div>
+
+                    <div class="card-costs">
+                        <p><span>A month</span><strong>{% if app.price %}£{{ app.monthly_cost|floatformat:"2g" }}{% else %}Free{% endif %}</strong></p>
+                        <p><span>A year</span><strong>{% if app.price %}£{{ app.yearly_cost|floatformat:"2g" }}{% else %}Free{% endif %}</strong></p>
+                        <p><span>Next payment</span><strong>{% if app.next_payment_date %}{{ app.next_payment_date|date:"j M" }}{% else %}Not set{% endif %}</strong></p>
+                    </div>
+
+                    <div class="card-health">
+                        <p class="card-health-top"><strong>App health</strong>
+                            <span class="centre-pill badge-{{ app.health.light }}">{{ app.health.score }}/100 · {{ app.health.label }}</span></p>
+                        <div class="health-bar" role="img" aria-label="Health score {{ app.health.score }} out of 100">
+                            <span class="badge-{{ app.health.light }}" style="width: {{ app.health.score }}%"></span>
+                        </div>
+                        <p class="health-reason">{{ app.health.reason }}</p>
+                        {% if app.trial_end_date %}<p class="health-reason">Free trial ends {{ app.trial_end_date|date:"j F Y" }}.</p>{% endif %}
+                    </div>
+
+                    {% if app.benefits %}
+                        <h3>What you get</h3>
+                        <p>{{ app.benefits }}</p>
+                    {% endif %}
+
+                    {% if app.health.tips %}
+                        <h3>Ways to save</h3>
+                        <ul class="card-tips">
+                            {% for tip in app.health.tips %}
+                                <li><span>{{ tip.text }}</span><span class="save-pill">Save £{{ tip.monthly_saving|floatformat:"2g" }} a month</span></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <div class="button-row">
+                        <a class="button" href="{% url 'subscription_edit' app.pk %}">Edit details</a>
+                        <a class="button button-secondary" href="{% url 'subscription_delete' app.pk %}">Remove</a>
+                    </div>
+                </dialog>
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="card">
+            <h1>Welcome to AppWheel</h1>
+            <p class="lead">Spins all your apps into control.</p>
+            <p>Let's put your apps on the wheel. The quickest way is to upload your bank statements and we'll find them for you.</p>
+            <div class="button-row">
+                <a class="button" href="{% url 'statement_upload' %}">Upload bank statements</a>
+                <a class="button button-secondary" href="{% url 'subscription_add' %}">Add an app myself</a>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="card account-links">
+        <h2>Your account</h2>
+        <p>Signed in as <strong>{{ user.email }}</strong></p>
         <ul class="plain-list">
             <li><a href="{% url 'account_change_password' %}">Change my password</a></li>
             <li><a href="{% url 'account_email' %}">Manage my email</a></li>
@@ -14,3 +151,7 @@
         </ul>
     </section>
 {% endblock content %}
+
+{% block extra_body %}
+    {% if apps %}<script src="{% static 'js/wheel.js' %}"></script>{% endif %}
+{% endblock extra_body %}

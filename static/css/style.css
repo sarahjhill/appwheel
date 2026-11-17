@@ -248,3 +248,134 @@ input[type="search"] {
 .ways-to-save { margin: 0.5rem 0; padding: 0.5rem 0.75rem; border-left: 3px solid var(--green); background: #1b1636; border-radius: 0.5rem; }
 .ways-to-save h3 { margin: 0 0 0.25rem; font-size: 0.9rem; }
 .ways-to-save ul { margin: 0; padding-left: 1.1rem; }
+
+/* ===== The App Wheel (home page) ===== */
+.page > .wheel-page { padding: 0; background: none; border: none; box-shadow: none; }
+.spend-card {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+    padding: 1rem 1.1rem; border-radius: 1.25rem; background: var(--card);
+}
+.spend-card p { margin: 0; }
+.spend-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.spend-amount { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+.spend-amount span { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+.save-box {
+    text-align: right; padding: 0.6rem 0.75rem; border-radius: 0.9rem;
+    background: #123d2b; border: 1px solid #2f7d57; color: #a7f3c9; font-size: 0.75rem; font-weight: 600;
+}
+.save-amount { font-size: 1.25rem !important; font-weight: 800; color: var(--green); }
+
+.wheel {
+    --rot: 0deg;
+    --size: min(300px, 84vw);
+    --app: 60px;
+    --turn-time: 0.5s;
+    --turn-ease: ease;
+    position: relative; width: var(--size); margin: 0.9rem auto 0; padding-top: 18px;
+}
+.wheel-crowded { --app: 48px; }
+.wheel.is-spinning { --turn-time: 1.4s; --turn-ease: cubic-bezier(0.12, 0.8, 0.2, 1); }
+.wheel-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: var(--text); }
+.wheel-area { position: relative; width: var(--size); height: var(--size); }
+.wheel-track {
+    position: absolute; inset: 2%; border-radius: 50%; border: 2px dashed var(--line);
+}
+.wheel-ring {
+    list-style: none; margin: 0; padding: 0; position: absolute; inset: 0;
+    transform: rotate(var(--rot));
+    transition: transform var(--turn-time) var(--turn-ease);
+}
+.wheel-slot {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(var(--size) * -0.373)) rotate(calc(-1 * var(--angle)));
+}
+.wheel-app {
+    width: var(--app); height: var(--app); padding: 0; margin: 0; min-height: 0;
+    border: none; border-radius: 50%; background: none; cursor: pointer;
+}
+.wheel-app-face {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: var(--app); height: var(--app); border-radius: 50%;
+    background: #2a2350; border: 3px solid var(--line);
+    transform: rotate(calc(-1 * var(--rot)));
+    transition: transform var(--turn-time) var(--turn-ease), box-shadow 0.3s;
+}
+.wheel-app.is-selected .wheel-app-face {
+    transform: rotate(calc(-1 * var(--rot))) scale(1.14);
+    box-shadow: 0 0 0 5px rgba(167, 139, 250, 0.35), 0 0 22px var(--accent);
+}
+.wheel-app-name {
+    font-size: 0.68rem; font-weight: 800; color: var(--text); line-height: 1.1;
+    max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wheel-crowded .wheel-app-name { font-size: 0.6rem; }
+.light-border-green, .light-border-green .wheel-app-face { border-color: var(--green); }
+.light-border-amber, .light-border-amber .wheel-app-face { border-color: var(--amber); }
+.light-border-red, .light-border-red .wheel-app-face { border-color: var(--red); }
+.wheel-badge {
+    position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; border: 2px solid var(--ground);
+}
+.badge-green { background: var(--green); color: var(--ground); }
+.badge-amber { background: var(--amber); color: var(--ground); }
+.badge-red { background: var(--red); color: var(--ground); }
+
+.wheel-centre {
+    position: absolute; left: 27.3%; top: 27.3%; width: 45.4%; height: 45.4%; margin: 0; padding: 0.5rem;
+    border-radius: 50%; background: var(--card); border: 2px solid var(--line); color: var(--text);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
+}
+.wheel-centre #wheel-selected { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.centre-name { font-size: 1rem; font-weight: 800; line-height: 1.15; text-align: center; }
+.centre-price { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.centre-pill { font-size: 0.7rem; font-weight: 800; border-radius: 999px; padding: 0.15rem 0.6rem; }
+.centre-hint { font-size: 0.7rem; color: #c4b5fd; font-weight: 600; }
+
+.wheel-controls { display: flex; justify-content: center; align-items: center; gap: 0.75rem; margin-top: 0.75rem; }
+.wheel-controls .button { margin-top: 0; }
+.round-button {
+    width: 48px; height: 48px; min-height: 48px; margin: 0; padding: 0; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--line); color: var(--text);
+}
+.wheel-key { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.9rem; font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.wheel-key > span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.key-dot { width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 800; }
+.wheel-more { text-align: center; }
+.wheel-links { justify-content: center; }
+.account-links { margin-top: 1.5rem; }
+
+/* App card (opens over the wheel) */
+.app-card {
+    width: min(36rem, 100%); max-height: 88vh; margin: auto auto 0; padding: 1.25rem 1.25rem 1.75rem;
+    border: none; border-radius: 1.75rem 1.75rem 0 0; background: #1e1838; color: var(--text);
+}
+.app-card::backdrop { background: rgba(8, 6, 20, 0.65); }
+.card-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; }
+.card-tile {
+    width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; border: 3px solid var(--line);
+    background: #2a2350; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800;
+}
+.card-title { flex: 1; min-width: 0; }
+.card-title h2 { margin: 0; font-size: 1.25rem; }
+.card-title p { margin: 0.1rem 0 0; font-size: 0.85rem; color: var(--muted); }
+.close-button {
+    width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0; border-radius: 50%;
+    background: #2a2350; color: var(--text);
+}
+.card-costs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-bottom: 0.9rem; }
+.card-costs p { margin: 0; padding: 0.6rem; border-radius: 0.9rem; background: var(--card); display: flex; flex-direction: column; }
+.card-costs span { font-size: 0.7rem; color: var(--muted); }
+.card-costs strong { font-size: 1rem; }
+.card-health { padding: 0.75rem 0.9rem; border-radius: 1rem; background: var(--card); margin-bottom: 0.9rem; }
+.card-health-top { display: flex; justify-content: space-between; align-items: center; margin: 0 0 0.5rem; font-size: 0.85rem; }
+.health-bar { height: 10px; border-radius: 999px; background: var(--ground); overflow: hidden; }
+.health-bar span { display: block; height: 100%; border-radius: 999px; }
+.app-card h3 { font-size: 0.9rem; margin: 1rem 0 0.5rem; }
+.card-tips { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+.card-tips li { padding: 0.6rem 0.75rem; border-radius: 0.9rem; background: var(--card); display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; }
+.save-pill { align-self: flex-start; font-size: 0.75rem; font-weight: 800; color: var(--ground); background: var(--green); border-radius: 999px; padding: 0.15rem 0.6rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    .wheel-ring, .wheel-app-face { transition: none; }
+}

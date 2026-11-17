@@ -16,13 +16,13 @@
             <div class="totals" aria-label="Your totals">
                 <p class="total">
                     <span class="total-label">You spend</span>
-                    <span class="total-amount">£{{ summary.monthly_total }}</span>
-                    <span class="total-label">a month · £{{ summary.yearly_total }} a year</span>
+                    <span class="total-amount">£{{ summary.monthly_total|floatformat:"2g" }}</span>
+                    <span class="total-label">a month · £{{ summary.yearly_total|floatformat:"2g" }} a year</span>
                 </p>
                 {% if summary.possible_yearly_saving %}
                     <p class="total total-saving">
                         <span class="total-label">You could save up to</span>
-                        <span class="total-amount">£{{ summary.possible_yearly_saving }}</span>
+                        <span class="total-amount">£{{ summary.possible_yearly_saving|floatformat:"2g" }}</span>
                         <span class="total-label">a year</span>
                     </p>
                 {% endif %}
@@ -72,7 +72,7 @@
                         </div>
                         <p class="app-price">
                             {% if subscription.price %}
-                                £{{ subscription.price }}
+                                £{{ subscription.price|floatformat:"2g" }}
                                 <span>{{ subscription.get_billing_period_display|lower }}</span>
                             {% else %}
                                 Free
