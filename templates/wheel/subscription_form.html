@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block head_title %}Add an app{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Add an app</h1>
+        <p class="lead">Add an app or subscription you pay for, or a free one you use.</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label|capfirst }}{% if not field.field.required %} <span class="optional">(optional)</span>{% endif %}
+                    </label>
+                    {% if field.help_text %}
+                        <p class="help-text" id="{{ field.id_for_label }}_help">{{ field.help_text }}</p>
+                    {% endif %}
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="button">Add app</button>
+        </form>
+
+        <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}

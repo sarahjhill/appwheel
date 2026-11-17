@@ -8,6 +8,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     # Sign up, log in, log out, password reset (django-allauth)
     path('accounts/', include('allauth.urls')),
+    # My apps and subscriptions (the App Wheel)
+    path('apps/', include('wheel.urls')),
     # The main app pages
     path('', include('core.urls')),
 ]

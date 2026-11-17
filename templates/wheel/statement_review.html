@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block head_title %}Check your apps{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>We found {{ found|length }} regular payment{{ found|length|pluralize }}</h1>
+        <p class="lead">Tick the ones you want to add to AppWheel.</p>
+        <p>We've ticked the apps we recognise. Other regular payments, like bills, are left for you to choose.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <ul class="app-list">
+                {% for item in found %}
+                    <li class="app-item found-item">
+                        {% if item.already_added %}
+                            <div>
+                                <h2 class="app-name">{{ item.name }}</h2>
+                                <p class="app-meta">Already in your apps</p>
+                            </div>
+                        {% else %}
+                            <label class="found-label" for="add-{{ forloop.counter0 }}">
+                                <input type="checkbox" id="add-{{ forloop.counter0 }}" name="add" value="{{ forloop.counter0 }}"{% if item.known %} checked{% endif %}>
+                                <span>
+                                    <span class="app-name">{{ item.name }}</span>
+                                    {% if item.source == 'screenshot' %}
+                                        <span class="app-meta">{% if item.plan_name %}{{ item.plan_name }} · {% endif %}{% if item.trial_end_date %}Free trial ends {{ item.trial_end_date }}{% elif item.next_payment_date %}Renews {{ item.next_payment_date }}{% else %}From your screenshot{% endif %}</span>
+                                    {% else %}
+                                        <span class="app-meta">Paid {{ item.times_paid }} time{{ item.times_paid|pluralize }} · last on {{ item.last_paid }}</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                        {% endif %}
+                        <p class="app-price">
+                            £{{ item.price }}
+                            <span>{% if item.billing_period == 'weekly' %}every week{% elif item.billing_period == 'yearly' %}every year{% else %}every month{% endif %}</span>
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit" class="button">Add ticked apps</button>
+        </form>
+        <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}

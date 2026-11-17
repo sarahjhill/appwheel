@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # AppWheel's own apps
     'core',
     'accounts',
+    'wheel',
 ]
 
 MIDDLEWARE = [
@@ -120,9 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/London'
 
 USE_I18N = True
 
@@ -192,3 +193,8 @@ SOCIALACCOUNT_PROVIDERS = {
 # (Google-verified) email, log them into their existing account.
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Reading screenshots of subscriptions with AI (Anthropic's Claude)
+# Get a key from console.anthropic.com and put it in .env
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-5-5")

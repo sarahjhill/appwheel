@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block head_title %}Upload bank statements{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Upload your bank statements</h1>
+        <p class="lead">We'll find your apps and subscriptions for you.</p>
+
+        <div class="privacy-note">
+            <h2>Your statements stay private</h2>
+            <ul class="plain-list">
+                <li>We read your files once and then throw them away. They are never saved.</li>
+                <li>We don't connect to your bank or ask for your bank login.</li>
+                <li>Only the payments you tick on the next page are added to AppWheel.</li>
+            </ul>
+        </div>
+
+        <h2>How to get your statements</h2>
+        <ol class="plain-list">
+            <li>Open your banking app or website.</li>
+            <li>Find <strong>Statements</strong>, <strong>Download</strong> or <strong>Export</strong>.</li>
+            <li>Download the last <strong>3 months</strong>, as a <strong>PDF</strong> or <strong>CSV</strong>. Three months lets us spot what you pay every month.</li>
+        </ol>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="button">Find my apps</button>
+        </form>
+
+        <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block head_title %}My apps{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>My apps</h1>
+        <p class="lead">Every app and subscription you pay for, in one place.</p>
+        <div class="button-row">
+            <a class="button" href="{% url 'statement_upload' %}">Upload bank statements</a>
+            {% if screenshots_ready %}
+                <a class="button" href="{% url 'screenshot_upload' %}">Upload a screenshot</a>
+            {% endif %}
+            <a class="button button-secondary" href="{% url 'subscription_add' %}">Add an app myself</a>
+        </div>
+
+        {% if subscriptions %}
+            <ul class="app-list">
+                {% for subscription in subscriptions %}
+                    <li class="app-item">
+                        <div>
+                            <h2 class="app-name">{{ subscription.name }}</h2>
+                            <p class="app-meta">
+                                {% if subscription.plan_name %}{{ subscription.plan_name }} · {% endif %}{{ subscription.get_category_display }}
+                            </p>
+                            {% if subscription.next_payment_date %}
+                                <p class="app-meta">Next payment {{ subscription.next_payment_date|date:"j M Y" }}</p>
+                            {% endif %}
+                            {% if subscription.trial_end_date %}
+                                <p class="app-meta">Free trial ends {{ subscription.trial_end_date|date:"j M Y" }}</p>
+                            {% endif %}
+                        </div>
+                        <p class="app-price">
+                            {% if subscription.price %}
+                                £{{ subscription.price }}
+                                <span>{{ subscription.get_billing_period_display|lower }}</span>
+                            {% else %}
+                                Free
+                            {% endif %}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't added any apps yet. The quickest way is to upload your bank statements and we'll find them for you.</p>
+        {% endif %}
+
+        <p><a href="{% url 'home' %}">Back to home</a></p>
+    </section>
+{% endblock content %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block head_title %}Upload a screenshot{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Upload a screenshot</h1>
+        <p class="lead">Take a picture of your subscriptions and we'll fill them in for you.</p>
+
+        {% if not is_set_up %}
+            <p class="message message-error">Screenshot reading isn't switched on yet. You can still upload a bank statement or add an app yourself.</p>
+        {% endif %}
+
+        <h2>How to take the screenshot</h2>
+        <p><strong>iPhone:</strong> open <strong>Settings</strong>, tap your name at the top, then <strong>Subscriptions</strong>. Take a screenshot by pressing the side button and volume up together.</p>
+        <p><strong>Android:</strong> open the <strong>Play Store</strong>, tap your picture at the top, then <strong>Payments and subscriptions</strong>, then <strong>Subscriptions</strong>. Take a screenshot by pressing power and volume down together.</p>
+        <p>You can also screenshot a bill or a "thanks for subscribing" email.</p>
+
+        <div class="privacy-note">
+            <h2>Your screenshots stay private</h2>
+            <ul class="plain-list">
+                <li>Your picture is sent securely to our AI reader (Claude, made by Anthropic) so it can read the details. It is not used to train AI.</li>
+                <li>AppWheel never saves your picture.</li>
+                <li>Only the subscriptions you tick on the next page are added.</li>
+            </ul>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="button"{% if not is_set_up %} disabled{% endif %}>Read my screenshot</button>
+        </form>
+        <p class="help-text">Reading a picture can take up to 20 seconds.</p>
+
+        <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}
