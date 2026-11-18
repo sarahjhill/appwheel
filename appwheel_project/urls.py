@@ -16,6 +16,8 @@ urlpatterns = [
     path('care/', include('care.urls')),
     # Help: emergency numbers and my important contacts
     path('help/', include('contacts.urls')),
+    # The to-do panel on the right of every page
+    path('todos/', include('todos.urls')),
     # The main app pages
     path('', include('core.urls')),
 ]

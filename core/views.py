@@ -78,6 +78,7 @@ def service_worker(request):
             static('css/style.css'),
             static('js/wheel.js'),
             static('js/pwa.js'),
+            static('js/todo.js'),
             static('icons/icon-192.png'),
         ],
     }, content_type='application/javascript')

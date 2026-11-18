@@ -56,7 +56,9 @@
         {% endif %}
         {% block content %}{% endblock content %}
     </main>
+    {% if user.is_authenticated %}{% include "todos/_panel.html" %}{% endif %}
     {% block extra_body %}{% endblock extra_body %}
     <script src="{% static 'js/pwa.js' %}" defer></script>
+    {% if user.is_authenticated %}<script src="{% static 'js/todo.js' %}" defer></script>{% endif %}
 </body>
 </html>

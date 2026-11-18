@@ -522,3 +522,73 @@ input[type="tel"] {
 /* Accessibility check (#28): comfortable tap sizes, focus on every control */
 .coming-up > a { display: inline-flex; align-items: center; min-height: 2.75rem; font-weight: 700; }
 summary:focus-visible, textarea:focus-visible, .wheel-app:focus-visible .wheel-app-face { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* ===== To-do panel (right side of every page) ===== */
+.todo-tab {
+    position: fixed; right: 0; top: 42%; z-index: 40;
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    padding: 0.9rem 0.45rem; min-width: 2.5rem;
+    border-radius: 0.9rem 0 0 0.9rem; background: var(--accent); color: var(--accent-dark);
+    font-weight: 800; font-size: 0.85rem; text-decoration: none; box-shadow: -4px 4px 18px rgba(0, 0, 0, 0.35);
+}
+.todo-tab:hover { color: var(--accent-dark); background: #c4b5fd; }
+.todo-tab-label { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.02em; }
+.todo-count {
+    min-width: 1.5rem; height: 1.5rem; padding: 0 0.3rem; border-radius: 999px;
+    background: var(--ground); color: var(--text); font-size: 0.75rem;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.todo-panel {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 50;
+    width: min(23rem, 100vw); padding: 1.1rem 1.1rem 1.5rem; overflow-y: auto;
+    background: #1e1838; border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45);
+    transform: translateX(100%); visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+}
+.todo-panel.is-open, .todo-panel:target {
+    transform: none; visibility: visible; transition: transform 0.25s ease;
+}
+.todo-panel.no-slide { transition: none; }
+body.todo-is-open .todo-tab { visibility: hidden; }
+.todo-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.todo-head h2 { margin: 0; }
+.todo-close { display: flex; align-items: center; justify-content: center; }
+.todo-add { display: flex; gap: 0.5rem; }
+.todo-add input {
+    flex: 1; min-width: 0; min-height: 2.75rem; padding: 0.5rem 0.9rem; border-radius: 0.75rem;
+    border: 1px solid #4a4170; background: #1b1636; color: var(--text); font: inherit;
+}
+.todo-list { list-style: none; padding: 0; margin: 0.9rem 0; display: grid; gap: 0.4rem; }
+.todo-item {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    padding: 0.45rem 0.5rem; border-radius: 0.8rem; background: var(--card);
+}
+.todo-inline { margin: 0; display: inline-flex; }
+.todo-check {
+    width: 2.25rem; height: 2.25rem; min-height: 2.25rem; margin: 0; padding: 0; border-radius: 50%;
+    background: transparent; border: 2px solid #6b5fa8; color: transparent; font-size: 0.95rem;
+}
+.todo-check[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--ground); }
+.todo-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.is-done .todo-text { text-decoration: line-through; color: var(--muted); }
+.todo-actions { display: inline-flex; gap: 0.15rem; }
+.todo-icon-button {
+    width: 2.25rem; height: 2.25rem; min-height: 2.25rem; margin: 0; padding: 0; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--muted);
+}
+.todo-icon-button:hover { background: #2a2350; color: var(--text); }
+.todo-edit-form { flex-basis: 100%; }
+.todo-edit-form input[type="text"] { min-height: 2.75rem; }
+.todo-edit-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.4rem; }
+.todo-edit-actions .button { margin: 0; }
+.is-editing .todo-text, .is-editing .todo-actions, .is-editing > .todo-inline { display: none; }
+.todo-empty { color: var(--muted); font-size: 0.9rem; }
+.todo-done summary { cursor: pointer; font-weight: 800; min-height: 2.75rem; display: flex; align-items: center; }
+@media (prefers-reduced-motion: reduce) {
+    .todo-panel, .todo-panel.is-open { transition: none; }
+}
+.todo-count[hidden] { display: none; }
+.todo-backlog { margin-top: 1.25rem; padding-top: 0.9rem; border-top: 1px dashed var(--line); }
+.todo-backlog h3 { margin: 0; font-size: 1rem; }
+.todo-hint { margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted); }
+.todo-backlog .todo-item { background: #1b1636; border: 1px dashed var(--line); }

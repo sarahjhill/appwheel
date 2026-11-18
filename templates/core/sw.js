@@ -2,7 +2,7 @@
    Privacy first: only the design files (styles, scripts, icons) and the offline
    page are saved on the phone. Your apps, reminders and care diary are never
    saved on the device, so nothing private is left on a shared or lost phone. */
-const CACHE = 'appwheel-v1';
+const CACHE = 'appwheel-v2';
 const FILES = [{% for file in files %}'{{ file }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
 const OFFLINE_URL = '{{ offline_url }}';
 
@@ -34,8 +34,17 @@ self.addEventListener('fetch', function (event) {
         return;
     }
 
-    // Design files: use the saved copy if there is one
+    // Design files: always get the latest version, and keep a copy for when there's no signal.
+    // (Using the saved copy first would show old styles after AppWheel is updated.)
     if (url.origin === self.location.origin && url.pathname.startsWith('/static/')) {
-        event.respondWith(caches.match(request).then(function (saved) { return saved || fetch(request); }));
+        event.respondWith(
+            fetch(request).then(function (response) {
+                if (response.ok) {
+                    const copy = response.clone();
+                    caches.open(CACHE).then(function (cache) { cache.put(request, copy); });
+                }
+                return response;
+            }).catch(function () { return caches.match(request); })
+        );
     }
 });

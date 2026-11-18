@@ -104,3 +104,10 @@ class InstallableAppTests(TestCase):
         response = self.client.get(reverse('account_login'))
         self.assertContains(response, 'rel="manifest"')
         self.assertContains(response, 'apple-touch-icon')
+
+
+class ServiceWorkerFreshnessTests(TestCase):
+    def test_design_files_are_fetched_fresh_before_using_the_saved_copy(self):
+        script = self.client.get('/sw.js').content.decode()
+        self.assertIn("fetch(request).then(function (response)", script)
+        self.assertNotIn("return saved || fetch(request)", script)

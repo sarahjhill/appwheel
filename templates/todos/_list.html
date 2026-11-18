@@ -1,0 +1,34 @@
+<div data-todo-count="{{ todo_items|length }}" data-todo-announce="{{ announce }}">
+    {% if todo_items %}
+        <ul class="todo-list">
+            {% for todo in todo_items %}{% include "todos/_item.html" %}{% endfor %}
+        </ul>
+    {% else %}
+        <p class="todo-empty">Nothing to do today. Add something above, like "Phone the GP" or "Check my Sky bill".</p>
+    {% endif %}
+
+    <section class="todo-backlog" aria-labelledby="todo-backlog-heading">
+        <h3 id="todo-backlog-heading">Backlog{% if todo_backlog %} ({{ todo_backlog|length }}){% endif %}</h3>
+        {% if todo_backlog %}
+            <p class="todo-hint">Not done from earlier days. Tap ↑ to move one back to today.</p>
+            <ul class="todo-list">
+                {% for todo in todo_backlog %}{% include "todos/_item.html" with in_backlog=True %}{% endfor %}
+            </ul>
+        {% else %}
+            <p class="todo-hint">Anything not done by the end of the day comes here.</p>
+        {% endif %}
+    </section>
+
+    {% if todo_done %}
+        <details class="todo-done">
+            <summary>Done ({{ todo_done|length }})</summary>
+            <ul class="todo-list">
+                {% for todo in todo_done %}{% include "todos/_item.html" %}{% endfor %}
+            </ul>
+            <form method="post" action="{% url 'todo_clear_done' %}" data-todo-form>
+                {% csrf_token %}<input type="hidden" name="next" value="{{ todo_next }}">
+                <button type="submit" class="link-button">Clear the done list</button>
+            </form>
+        </details>
+    {% endif %}
+</div>

@@ -1,0 +1,21 @@
+<a class="todo-tab" href="#todo-panel" data-todo-tab aria-controls="todo-panel">
+    <span class="todo-tab-label">To do</span>
+    <span class="todo-count" data-todo-badge{% if not todo_items %} hidden{% endif %}>{{ todo_items|length }}<span class="visually-hidden"> left today</span></span>
+</a>
+<aside id="todo-panel" class="todo-panel" aria-labelledby="todo-heading" data-todo-panel tabindex="-1">
+    <div class="todo-head">
+        <h2 id="todo-heading">To do</h2>
+        <a class="close-button todo-close" href="#main" data-todo-close>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg>
+            <span class="visually-hidden">Close the to-do list</span>
+        </a>
+    </div>
+    <form method="post" action="{% url 'todo_add' %}" class="todo-add" data-todo-form data-todo-add>
+        {% csrf_token %}<input type="hidden" name="next" value="{{ todo_next }}">
+        <label for="todo-new" class="visually-hidden">Add a to-do</label>
+        <input id="todo-new" type="text" name="text" maxlength="200" placeholder="Add a to-do" autocomplete="off" required>
+        <button type="submit" class="button button-small">Add</button>
+    </form>
+    <p class="visually-hidden" role="status" aria-live="polite" data-todo-status></p>
+    <div data-todo-list>{% include "todos/_list.html" %}</div>
+</aside>

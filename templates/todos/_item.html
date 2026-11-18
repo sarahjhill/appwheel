@@ -1,0 +1,50 @@
+<li class="todo-item{% if todo.done %} is-done{% endif %}" data-todo-item>
+    <form method="post" action="{% url 'todo_toggle' todo.pk %}" data-todo-form class="todo-inline">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ todo_next }}">
+        <button type="submit" class="todo-check" aria-pressed="{% if todo.done %}true{% else %}false{% endif %}">
+            <span aria-hidden="true">✓</span>
+            <span class="visually-hidden">Done: {{ todo.text }}</span>
+        </button>
+    </form>
+    <span class="todo-text" data-todo-text>{{ todo.text }}</span>
+    <form method="post" action="{% url 'todo_edit' todo.pk %}" data-todo-form class="todo-edit-form" data-todo-edit-form hidden>
+        {% csrf_token %}<input type="hidden" name="next" value="{{ todo_next }}">
+        <label class="visually-hidden" for="todo-edit-{{ todo.pk }}">Change "{{ todo.text }}"</label>
+        <input id="todo-edit-{{ todo.pk }}" type="text" name="text" value="{{ todo.text }}" maxlength="200" required>
+        <div class="todo-edit-actions">
+            <button type="submit" class="button button-small">Save</button>
+            <button type="button" class="link-button" data-todo-cancel>Cancel</button>
+        </div>
+    </form>
+    <span class="todo-actions" data-todo-actions>
+        {% if not todo.done %}
+            <form method="post" action="{% url 'todo_move' todo.pk %}" data-todo-form class="todo-inline">
+                {% csrf_token %}<input type="hidden" name="next" value="{{ todo_next }}">
+                {% if in_backlog %}
+                    <input type="hidden" name="to" value="today">
+                    <button type="submit" class="todo-icon-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span class="visually-hidden">Move to today: {{ todo.text }}</span>
+                    </button>
+                {% else %}
+                    <input type="hidden" name="to" value="backlog">
+                    <button type="submit" class="todo-icon-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        <span class="visually-hidden">Move to the backlog: {{ todo.text }}</span>
+                    </button>
+                {% endif %}
+            </form>
+        {% endif %}
+        <a class="todo-icon-button" href="{% url 'todo_edit' todo.pk %}?next={{ todo_next|urlencode }}" data-todo-edit>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M11 2.5l2.5 2.5L6 12.5H3.5V10z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+            <span class="visually-hidden">Edit: {{ todo.text }}</span>
+        </a>
+        <form method="post" action="{% url 'todo_delete' todo.pk %}" data-todo-form class="todo-inline">
+            {% csrf_token %}<input type="hidden" name="next" value="{{ todo_next }}">
+            <button type="submit" class="todo-icon-button">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                <span class="visually-hidden">Delete: {{ todo.text }}</span>
+            </button>
+        </form>
+    </span>
+</li>

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head_title %}Edit to-do{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Edit to-do</h1>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <label for="text">To-do</label>
+            <input id="text" type="text" name="text" value="{{ todo.text }}" maxlength="200" required>
+            <button type="submit" class="button">Save</button>
+        </form>
+        <p><a href="{% url 'home' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}
