@@ -714,3 +714,138 @@ body.cal-is-open .cal-tab { visibility: hidden; }
 }
 .ask-chip:hover, .ask-chip:focus-visible { background: var(--accent); color: #fff; }
 .ask-chip:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===================== Public homepage ===================== */
+/* Larger, calmer reading for everyone: 18px text, short lines, big buttons */
+.page.landing { max-width: 68rem; padding: 0 1.25rem 2rem; font-size: 1.125rem; line-height: 1.6; }
+/* Undo the app's card look for homepage sections (each section sets its own spacing below) */
+.page.landing > section { background: none; padding: 0; border-radius: 0; }
+body:has(.page.landing) .site-header { max-width: 68rem; }
+.visitor-nav { display: flex; align-items: center; gap: 0.75rem; }
+.visitor-nav .button { margin-top: 0; }
+
+.page.landing > .lp-hero {
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 3rem;
+    align-items: center; padding: 2.5rem 0 3rem;
+}
+.lp-title {
+    font-size: clamp(2.4rem, 6vw, 4.25rem); line-height: 1.02; letter-spacing: -0.035em; font-weight: 800;
+    margin: 0 0 1.25rem; max-width: 12ch;
+}
+.lp-intro { font-size: 1.25rem; line-height: 1.55; max-width: 34rem; margin: 0 0 0.9rem; color: var(--text); }
+.lp-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+.lp-actions .button, .lp-button { margin-top: 0; min-height: 3.5rem; padding: 0 1.75rem; font-size: 1.1rem; }
+.lp-small { font-size: 0.95rem; color: var(--muted); margin: 0.9rem 0 0; }
+
+/* The example wheel (the one bold thing on the page) */
+.lp-demo { margin: 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.lp-wheel {
+    --rot: 0deg; --size: min(380px, 86vw); --app: 72px; --turn-time: 0.45s; --turn-ease: ease;
+    position: relative; width: var(--size); padding-top: 20px;
+}
+.lp-wheel.is-spinning { --turn-time: 1.3s; --turn-ease: cubic-bezier(0.12, 0.8, 0.2, 1); }
+.lp-wheel .wheel-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); color: var(--text); }
+.lp-wheel-area { position: relative; width: var(--size); height: var(--size); }
+.lp-ring {
+    list-style: none; margin: 0; padding: 0; position: absolute; inset: 0;
+    transform: rotate(var(--rot)); transition: transform var(--turn-time) var(--turn-ease);
+}
+.lp-slot {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(var(--size) * -0.38)) rotate(calc(-1 * var(--angle)));
+}
+.lp-app { width: var(--app); height: var(--app); min-height: 0; margin: 0; padding: 0; border-radius: 50%; background: none; border: none; }
+.lp-app-face {
+    display: flex; width: var(--app); height: var(--app); padding: 4px; border-radius: 50%;
+    border: 4px solid var(--line); background: #2a2350;
+    transform: rotate(calc(-1 * var(--rot))); transition: transform var(--turn-time) var(--turn-ease), box-shadow 0.3s;
+}
+.lp-app.light-border-green .lp-app-face { border-color: var(--green); }
+.lp-app.light-border-amber .lp-app-face { border-color: var(--amber); }
+.lp-app.light-border-red .lp-app-face { border-color: var(--red); }
+.lp-app.is-selected .lp-app-face { transform: rotate(calc(-1 * var(--rot))) scale(1.15); box-shadow: 0 0 0 6px rgba(167, 139, 250, 0.35); }
+.lp-app:focus-visible { outline: none; }
+.lp-app:focus-visible .lp-app-face { outline: 3px solid var(--accent); outline-offset: 3px; }
+.lp-app .app-initials { font-size: 1.3rem; }
+.lp-centre {
+    position: absolute; left: 29%; top: 29%; width: 42%; height: 42%; border-radius: 50%;
+    background: var(--card); border: 2px solid var(--line);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; padding: 0.5rem;
+}
+.lp-centre-name { font-size: 1.3rem; font-weight: 800; line-height: 1.1; }
+.lp-centre-price { font-size: 0.95rem; color: var(--muted); font-weight: 600; }
+.lp-verdict { min-height: 6.5rem; margin-top: 0.75rem; max-width: 24rem; }
+.lp-verdict-light { margin: 0 0 0.4rem; }
+.lp-verdict-light .light { font-size: 1rem; padding: 0.3rem 0.8rem; }
+.lp-verdict-tip { margin: 0; font-size: 1.1rem; }
+.lp-spin { margin-top: 0.5rem; min-height: 3.25rem; }
+
+/* Sections: quiet and readable */
+.page.landing > .lp-section { padding: 3rem 0; border-top: 1px solid var(--line); max-width: 60rem; }
+.lp-section > p { max-width: 42rem; }
+.lp-heading { font-size: clamp(1.75rem, 3.6vw, 2.5rem); line-height: 1.12; letter-spacing: -0.025em; margin: 0 0 0.75rem; max-width: 22ch; }
+.lp-lead { color: var(--muted); font-size: 1.2rem; margin: 0 0 1.75rem; }
+.lp-section h3 { font-size: 1.25rem; margin: 0 0 0.4rem; }
+.lp-section h3 + p { margin: 0; }
+.lp-note {
+    padding: 1rem 1.25rem; border-left: 4px solid var(--green); background: #1b1636; border-radius: 0 0.75rem 0.75rem 0;
+}
+
+/* Getting started: a real numbered sequence */
+.lp-steps { list-style: none; counter-reset: step; padding: 0; margin: 1.5rem 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+.lp-steps li { counter-increment: step; }
+.lp-steps li::before {
+    content: counter(step); display: flex; align-items: center; justify-content: center;
+    width: 2.75rem; height: 2.75rem; margin-bottom: 0.75rem; border-radius: 50%;
+    background: var(--accent); color: var(--ground); font-weight: 800; font-size: 1.25rem;
+}
+
+/* Four ways in */
+.lp-ways { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 2.5rem; }
+.lp-ways svg { color: var(--accent); margin-bottom: 0.5rem; }
+
+/* The lights */
+.lp-light-rows { list-style: none; padding: 0; margin: 0 0 1.5rem; display: grid; gap: 1rem; max-width: 46rem; }
+.lp-light-rows li { display: grid; grid-template-columns: 11.5rem 1fr; gap: 1rem; align-items: baseline; }
+.lp-light-rows p { margin: 0; }
+.lp-light-rows .light { font-size: 0.95rem; justify-self: start; }
+
+.lp-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 3rem; }
+
+/* Care diary: the one warmer section */
+.page.landing > .lp-care { border-top: none; padding: 2.25rem 2rem; margin: 1rem 0; border-radius: 1.5rem; background: #23183a; border-left: 6px solid #93c5fd; }
+.lp-care .lp-note { border-left-color: #93c5fd; background: #1a1430; }
+
+/* Promises */
+.lp-checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; max-width: 42rem; }
+.lp-checks li { position: relative; padding-left: 2.25rem; }
+.lp-checks li::before {
+    content: "✓"; position: absolute; left: 0; top: 0.1rem; width: 1.6rem; height: 1.6rem; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; background: var(--green); color: var(--ground);
+    font-size: 0.9rem; font-weight: 800;
+}
+
+.lp-end { text-align: left; }
+.lp-footer { border-top: 1px solid var(--line); padding: 1.5rem 0 0; color: var(--muted); font-size: 0.95rem; }
+.lp-footer p { margin: 0.25rem 0; }
+
+@media (max-width: 860px) {
+    .page.landing > .lp-hero { grid-template-columns: 1fr; gap: 2rem; padding-top: 1.5rem; }
+    .lp-steps, .lp-ways, .lp-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+    .lp-light-rows li { grid-template-columns: 1fr; gap: 0.35rem; }
+    .page.landing > .lp-care { padding: 1.5rem 1.25rem; }
+}
+@media (max-width: 480px) {
+    .lp-wheel { --app: 58px; }
+    body:has(.page.landing) .brand-slogan { display: none; }
+    .visitor-nav { gap: 0.5rem; }
+    .visitor-nav .account-link, .visitor-nav .button { white-space: nowrap; font-size: 0.9rem; }
+    .lp-actions .button { width: 100%; }
+    .visitor-nav .button { padding: 0 0.9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .lp-ring, .lp-app-face { transition: none; }
+}
+@media (max-width: 360px) {
+    body:has(.page.landing) .site-header { flex-wrap: wrap; row-gap: 0.5rem; }
+}

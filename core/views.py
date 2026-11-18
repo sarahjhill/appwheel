@@ -11,10 +11,33 @@ from wheel.models import link_common_apps
 # The wheel fits up to 12 apps comfortably on a phone
 WHEEL_MAX_APPS = 12
 
+# Example apps for the demo wheel on the public homepage (letter tiles, not real logos)
+DEMO_APPS = [
+    {'name': 'Netflix', 'initials': 'Ne', 'tile': 'video', 'price': '12.99', 'light': 'amber', 'label': 'Could cost less',
+     'tip': 'Switch to Standard with adverts to save £60 a year'},
+    {'name': 'Spotify', 'initials': 'Sp', 'tile': 'music', 'price': '11.99', 'light': 'green', 'label': 'Good value',
+     'tip': 'You use it every day. Nothing to change.'},
+    {'name': 'PureGym', 'initials': 'Pu', 'tile': 'fitness', 'price': '24.99', 'light': 'red', 'label': 'Needs action',
+     'tip': 'You haven\'t been since August. Cancel to save £299.88 a year'},
+    {'name': 'iCloud+', 'initials': 'iC', 'tile': 'storage', 'price': '2.99', 'light': 'green', 'label': 'Good value',
+     'tip': 'Your photos are backed up. Nothing to change.'},
+    {'name': 'Headway', 'initials': 'He', 'tile': 'books', 'price': '9.99', 'light': 'red', 'label': 'Needs action',
+     'tip': 'Free trial ends in 2 days. Cancel before then to avoid paying'},
+    {'name': 'Disney+', 'initials': 'Di', 'tile': 'video', 'price': '4.99', 'light': 'amber', 'label': 'Could cost less',
+     'tip': 'You also pay for Netflix. Keep one to save £59.88 a year'},
+    {'name': 'Instagram', 'initials': 'In', 'tile': 'social', 'price': '0', 'light': 'amber', 'label': 'Could cost less',
+     'tip': 'Free, but your monthly privacy check-up is due'},
+    {'name': 'Canva', 'initials': 'Ca', 'tile': 'design', 'price': '10.99', 'light': 'green', 'label': 'Good value',
+     'tip': 'Used every week for work. Nothing to change.'},
+]
+for _index, _app in enumerate(DEMO_APPS):
+    _app['angle'] = round(_index * 360 / len(DEMO_APPS), 3)
 
-@login_required
+
 def home(request):
-    """The home page: the App Wheel."""
+    """Visitors see the AppWheel homepage; signed-in people see their App Wheel."""
+    if not request.user.is_authenticated:
+        return render(request, 'core/landing.html', {'demo_apps': _demo_apps_with_logos()})
     roll_forward_payment_dates(request.user)
     link_common_apps(request.user)
     subscriptions = list(
@@ -36,6 +59,16 @@ def home(request):
         'summary': summary,
         'coming_up': request.user.reminders.filter(is_done=False)[:3],
     })
+
+
+def _demo_apps_with_logos():
+    """Use each example app's official logo where one has been added in the admin."""
+    from wheel.models import CommonApp
+    icons = dict(
+        CommonApp.objects.filter(name__in=[app['name'] for app in DEMO_APPS]).exclude(icon='')
+        .values_list('name', 'icon')
+    )
+    return [app | {'icon_path': f'app-icons/{icons[app["name"]]}' if app['name'] in icons else ''} for app in DEMO_APPS]
 
 
 def _short_name(name):
@@ -63,7 +96,7 @@ def manifest(request):
     data = {
         'name': 'AppWheel',
         'short_name': 'AppWheel',
-        'description': 'Spins all your apps into control.',
+        'description': 'Spin your apps and life into control.',
         'start_url': '/?source=home-screen',
         'scope': '/',
         'display': 'standalone',

@@ -24,7 +24,7 @@
     <header class="site-header">
         <a class="brand" href="{% url 'home' %}">
             <span class="brand-name">AppWheel</span>
-            <span class="brand-slogan">Spins all your apps into control</span>
+            <span class="brand-slogan">Spin your apps and life into control</span>
         </a>
         {% if user.is_authenticated %}
             <nav aria-label="Account">
@@ -37,6 +37,11 @@
                     {% csrf_token %}
                     <button type="submit" class="link-button">Log out</button>
                 </form>
+            </nav>
+        {% else %}
+            <nav aria-label="Account" class="visitor-nav">
+                <a class="account-link" href="{% url 'account_login' %}">Log in</a>
+                <a class="button button-small" href="{% url 'account_signup' %}">Create account</a>
             </nav>
         {% endif %}
     </header>
@@ -52,7 +57,7 @@
         </nav>
     {% endif %}
 
-    <main id="main" class="page">
+    <main id="main" class="page {% block page_class %}{% endblock page_class %}">
         {% if messages %}
             <div class="messages" role="status">
                 {% for message in messages %}

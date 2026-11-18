@@ -1,6 +1,6 @@
 # AppWheel
 
-**Spins all your apps into control.**
+**Spin your apps and life into control.**
 
 AppWheel shows every app and subscription you pay for on one spinning wheel. Each app gets a traffic-light health score, so you can see at a glance what's good value, what could cost less and what needs action. Alongside that it keeps your reminders, appointments, a care diary and important contacts in one calm place.
 

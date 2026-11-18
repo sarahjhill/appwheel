@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load static %}
+{% block head_title %}Your apps, bills and life admin in one calm place{% endblock head_title %}
+{% block page_class %}landing{% endblock page_class %}
+{% block content %}
+
+{# ---------- Hero: what AppWheel is, and a wheel to try ---------- #}
+<section class="lp-hero" aria-labelledby="lp-title">
+    <div class="lp-hero-text">
+        <h1 id="lp-title" class="lp-title">Spin your apps and life into control.</h1>
+        <p class="lp-intro">See every app and subscription you pay for in one place, and what each one really costs.</p>
+        <p class="lp-intro">AppWheel also keeps your reminders, care diary and important numbers together, so life admin takes less out of you.</p>
+        <div class="lp-actions">
+            <a class="button lp-button" href="{% url 'account_signup' %}">Create your free account</a>
+            <a class="button button-secondary lp-button" href="{% url 'account_login' %}">Log in</a>
+        </div>
+        <p class="lp-small">Free while we're testing. No bank login. Nothing to install.</p>
+    </div>
+
+    <figure class="lp-demo" aria-labelledby="lp-demo-caption">
+        <div class="lp-wheel" data-demo-wheel>
+            <svg class="wheel-pointer" width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><path d="M10 14L0 0h20z" fill="currentColor"></path></svg>
+            <div class="lp-wheel-area">
+                <div class="wheel-track" aria-hidden="true"></div>
+                <ul class="lp-ring" data-demo-ring aria-label="Example apps. Choose one to see what AppWheel says about it.">
+                    {% for app in demo_apps %}
+                        <li class="lp-slot" style="--angle: {{ app.angle }}deg">
+                            <button type="button" class="lp-app light-border-{{ app.light }}" data-demo-app
+                                    data-name="{{ app.name }}" data-light="{{ app.light }}" data-label="{{ app.label }}"
+                                    data-price="{% if app.price != '0' %}£{{ app.price }} a month{% else %}Free{% endif %}" data-tip="{{ app.tip }}"
+                                    aria-label="{{ app.name }}: {{ app.label }}">
+                                <span class="lp-app-face">{% if app.icon_path %}<img class="app-icon-img" src="{% static app.icon_path %}" alt="" width="64" height="64">{% else %}<span class="app-initials tile-{{ app.tile }}" aria-hidden="true">{{ app.initials }}</span>{% endif %}</span>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="lp-centre" aria-hidden="true">
+                    <span class="lp-centre-name" data-demo-name>{{ demo_apps.0.name }}</span>
+                    <span class="lp-centre-price" data-demo-price>£{{ demo_apps.0.price }} a month</span>
+                </div>
+            </div>
+        </div>
+        <div class="lp-verdict" aria-live="polite">
+            <p class="lp-verdict-light"><span class="light light-{{ demo_apps.0.light }}" data-demo-light><span aria-hidden="true" data-demo-symbol>!</span> <span data-demo-label>{{ demo_apps.0.label }}</span></span></p>
+            <p class="lp-verdict-tip" data-demo-tip>{{ demo_apps.0.tip }}</p>
+        </div>
+        <button type="button" class="button lp-spin" data-demo-spin>Spin the example wheel</button>
+        <figcaption id="lp-demo-caption" class="lp-small">An example wheel. Tap any app, or spin it, to see what AppWheel tells you.</figcaption>
+    </figure>
+</section>
+
+{# ---------- Getting started (a real sequence, so it's numbered) ---------- #}
+<section class="lp-section lp-start" aria-labelledby="lp-start">
+    <h2 id="lp-start" class="lp-heading">Getting started is 3 steps</h2>
+    <ol class="lp-steps">
+        <li>
+            <h3>Create your account</h3>
+            <p>Use your email address and a password, or sign in with Google.</p>
+        </li>
+        <li>
+            <h3>Add the apps you pay for</h3>
+            <p>Add one at a time, or upload a bank statement and AppWheel finds them for you.</p>
+        </li>
+        <li>
+            <h3>See your wheel</h3>
+            <p>Each app shows what it costs and a light telling you if anything needs doing.</p>
+        </li>
+    </ol>
+    <p class="lp-note">You can change or undo anything later, so you can't get it wrong. If you'd like, ask someone you trust to sit with you while you set it up.</p>
+    <p><a class="button lp-button" href="{% url 'account_signup' %}">Create your free account</a></p>
+</section>
+
+{# ---------- Getting apps in ---------- #}
+<section class="lp-section" aria-labelledby="lp-in">
+    <h2 id="lp-in" class="lp-heading">Four ways to add your apps</h2>
+    <p class="lp-lead">You don't have to type it all in. Pick whichever way is easiest for you.</p>
+    <ul class="lp-ways">
+        <li>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <h3>Upload a bank statement</h3>
+            <p>A PDF or CSV from your banking app. We find the payments that repeat, then throw the file away.</p>
+        </li>
+        <li>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M10.5 18.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <h3>Take a screenshot</h3>
+            <p>Of the Subscriptions page on your iPhone or Android. AppWheel reads it for you.</p>
+        </li>
+        <li>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 6.5L12 13l8.5-6.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <h3>Paste an email</h3>
+            <p>Copy a receipt or "thanks for subscribing" email and paste it in.</p>
+        </li>
+        <li>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <h3>Choose from a list</h3>
+            <p>Search over 50 popular apps. Pick your plan and the price fills itself in.</p>
+        </li>
+    </ul>
+</section>
+
+{# ---------- The lights ---------- #}
+<section class="lp-section lp-lights" aria-labelledby="lp-lights">
+    <h2 id="lp-lights" class="lp-heading">One look tells you what needs doing</h2>
+    <p class="lp-lead">Every app gets a light, always with a symbol as well as a colour.</p>
+    <ul class="lp-light-rows">
+        <li>
+            <span class="light light-green"><span aria-hidden="true">✓</span> Good value</span>
+            <p><strong>Spotify, £11.99 a month.</strong> You use it every day and there's nothing cheaper for you.</p>
+        </li>
+        <li>
+            <span class="light light-amber"><span aria-hidden="true">!</span> Could cost less</span>
+            <p><strong>Netflix, £12.99 a month.</strong> The plan with adverts would save you £60 a year.</p>
+        </li>
+        <li>
+            <span class="light light-red"><span aria-hidden="true">✕</span> Needs action</span>
+            <p><strong>Gym, £24.99 a month.</strong> You said you never go. Cancelling saves £299.88 a year.</p>
+        </li>
+    </ul>
+    <p>When you're ready to cancel, <strong>Cancel with help</strong> shows you the steps for how you pay, reminds you to check you weren't charged again, and writes the refund request for you if you were.</p>
+</section>
+
+{# ---------- Everyday admin ---------- #}
+<section class="lp-section" aria-labelledby="lp-admin">
+    <h2 id="lp-admin" class="lp-heading">The rest of your life admin, in the same place</h2>
+    <div class="lp-pair">
+        <div>
+            <h3>Reminders and a calendar</h3>
+            <p>Free trials ending and payments coming up are added for you. Add appointments with a list of what to take, and repeat prescriptions with a link to the NHS App. Get one email on days when something's due.</p>
+        </div>
+        <div>
+            <h3>A to-do list that's always there</h3>
+            <p>Tap the red tab on any page. Anything you didn't get to today waits in your backlog, so nothing gets lost and nothing nags.</p>
+        </div>
+        <div>
+            <h3>Ask AppWheel</h3>
+            <p>Ask in your own words about bills, contracts or letters. Answers are plain English and show where the information came from.</p>
+        </div>
+        <div>
+            <h3>Works on your phone</h3>
+            <p>Add it to your home screen and it opens like any other app. For your privacy, nothing personal is stored on the phone itself.</p>
+        </div>
+    </div>
+</section>
+
+{# ---------- Care diary ---------- #}
+<section class="lp-section lp-care" aria-labelledby="lp-care">
+    <h2 id="lp-care" class="lp-heading">If you get care at home, keep a record that counts</h2>
+    <p>Each day, answer four quick questions: did your carer arrive on time, were you treated with kindness and respect, did you get your medication, and did you get help with food, washing and dressing.</p>
+    <p>If something isn't right, AppWheel tells you who to go to, in order: the care company, your council, the care regulator and the ombudsman. Download your diary as a tidy PDF to send to whoever you choose.</p>
+    <p class="lp-note">Your diary is private. AppWheel never sends it to anyone. You decide who sees it.</p>
+</section>
+
+{# ---------- Help and safety ---------- #}
+<section class="lp-section" aria-labelledby="lp-help">
+    <h2 id="lp-help" class="lp-heading">Help when you need it</h2>
+    <div class="lp-pair">
+        <div>
+            <h3>Important numbers, one tap away</h3>
+            <p>999, NHS 111, police 101 and Samaritans 116 123, plus your own GP, pharmacy, next of kin and care company.</p>
+        </div>
+        <div>
+            <h3>Safety on social apps</h3>
+            <p>Short guides for Facebook, Instagram, TikTok, WhatsApp, X and Snapchat: block someone, make posts private, report a scam, and a monthly privacy check-up.</p>
+        </div>
+    </div>
+</section>
+
+{# ---------- Promises ---------- #}
+<section class="lp-section lp-promises" aria-labelledby="lp-promises">
+    <h2 id="lp-promises" class="lp-heading">Our promises to you</h2>
+    <ul class="lp-checks">
+        <li>We never ask for your bank login or connect to your bank.</li>
+        <li>Statements and screenshots are read once and never saved.</li>
+        <li>Your information is only ever seen by you.</li>
+        <li>No adverts, and we never sell your data.</li>
+        <li>Delete any part of it, or your whole account, whenever you want.</li>
+    </ul>
+</section>
+
+{# ---------- Accessibility ---------- #}
+<section class="lp-section" aria-labelledby="lp-access">
+    <h2 id="lp-access" class="lp-heading">Made to work the way you do</h2>
+    <p>AppWheel works with screen readers, a keyboard or switch, and text zoomed right up. Colours always come with symbols. Nothing moves unless you ask it to, and it stays still if you've turned off motion on your device. If anything gets in your way, tell us and we'll fix it.</p>
+</section>
+
+{# ---------- Last call ---------- #}
+<section class="lp-section lp-end" aria-labelledby="lp-end">
+    <h2 id="lp-end" class="lp-heading">Ready to take back control?</h2>
+    <p>It takes about two minutes to set up. Start with one app, or upload a statement and let AppWheel do the rest.</p>
+    <div class="lp-actions">
+        <a class="button lp-button" href="{% url 'account_signup' %}">Create your free account</a>
+        <a class="button button-secondary lp-button" href="{% url 'account_login' %}">Log in</a>
+    </div>
+</section>
+
+<footer class="lp-footer">
+    <p>AppWheel is made in Cardiff by <a href="https://sarahjhill.com">Sarah J Hill</a>.</p>
+    <p>Money tips in AppWheel are suggestions, not financial advice.</p>
+</footer>
+{% endblock content %}
+
+{% block extra_body %}<script src="{% static 'js/landing.js' %}" defer></script>{% endblock extra_body %}

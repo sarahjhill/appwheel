@@ -4,10 +4,13 @@ from django.urls import reverse
 
 
 class HomePageTests(TestCase):
-    def test_logged_out_visitors_are_sent_to_log_in(self):
+    def test_logged_out_visitors_see_the_appwheel_homepage(self):
         response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse('account_login'), response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'core/landing.html')
+        self.assertContains(response, 'Create your free account')
+        self.assertContains(response, reverse('account_signup'))
+        self.assertContains(response, 'data-demo-wheel')
 
     def test_logged_in_users_see_the_home_page(self):
         user = get_user_model().objects.create_user(
@@ -16,7 +19,7 @@ class HomePageTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Spins all your apps into control')
+        self.assertContains(response, 'Spin your apps and life into control')
 
 
 class WheelPageTests(TestCase):
@@ -109,7 +112,7 @@ class InstallableAppTests(TestCase):
 class ServiceWorkerFreshnessTests(TestCase):
     def test_design_files_are_fetched_fresh_before_using_the_saved_copy(self):
         script = self.client.get('/sw.js').content.decode()
-        self.assertIn("fetch(request).then(function (response)", script)
+        self.assertIn("fetch(request, { cache: 'no-cache' })", script)
         self.assertNotIn("return saved || fetch(request)", script)
 
 
@@ -134,3 +137,20 @@ class AccountMenuTests(TestCase):
     def test_account_page_needs_logging_in(self):
         self.client.logout()
         self.assertEqual(self.client.get(reverse('account')).status_code, 302)
+
+
+class FreshStylesTests(TestCase):
+    def test_design_files_are_never_reused_from_the_browser_while_building(self):
+        from django.test import override_settings
+        with override_settings(DEBUG=True):
+            response = self.client.get('/static/css/style.css')
+        self.assertEqual(response['Cache-Control'], 'no-cache')
+
+
+class LandingLogoTests(TestCase):
+    def test_example_wheel_uses_official_logos_where_added_and_tiles_otherwise(self):
+        from wheel.models import CommonApp
+        CommonApp.objects.filter(name='Netflix').update(icon='netflix.png')
+        response = self.client.get(reverse('home'))
+        self.assertContains(response, 'src="/static/app-icons/netflix.png"')
+        self.assertContains(response, 'tile-books')  # Headway has no logo, so it keeps its tile
