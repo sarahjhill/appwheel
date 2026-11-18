@@ -14,6 +14,8 @@ urlpatterns = [
     path('reminders/', include('reminders.urls')),
     # Care diary
     path('care/', include('care.urls')),
+    # Help: emergency numbers and my important contacts
+    path('help/', include('contacts.urls')),
     # The main app pages
     path('', include('core.urls')),
 ]

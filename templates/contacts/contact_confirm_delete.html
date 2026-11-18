@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block head_title %}Remove {{ contact.name }}{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Remove {{ contact.name }}?</h1>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="button button-danger">Yes, remove</button>
+        </form>
+        <p><a href="{% url 'help_page' %}">No, keep them</a></p>
+    </section>
+{% endblock content %}

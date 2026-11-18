@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block head_title %}Help and contacts{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Help and contacts</h1>
+        <p class="lead">Tap a number to call it.</p>
+
+        {% for item in emergency %}
+            <a class="call-card call-urgent" href="{{ item.link }}">
+                <span class="call-number">{{ item.number }}</span>
+                <span class="call-text">
+                    <strong>{{ item.name }}</strong>
+                    <span>{{ item.when }}</span>
+                </span>
+                <span class="visually-hidden">: call {{ item.number }}</span>
+            </a>
+        {% endfor %}
+
+        <ul class="plain-list cant-speak">
+            {% for tip in cant_speak %}<li>{{ tip }}</li>{% endfor %}
+        </ul>
+
+        <h2 class="section-heading">When it's not an emergency</h2>
+        <div class="call-list">
+            {% for item in non_emergency %}
+                <a class="call-card" href="{{ item.link }}">
+                    <span class="call-number">{{ item.number }}</span>
+                    <span class="call-text">
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.when }}</span>
+                    </span>
+                </a>
+            {% endfor %}
+        </div>
+
+        <h2 class="section-heading">My important contacts</h2>
+        {% if contacts %}
+            <ul class="contact-list">
+                {% for contact in contacts %}
+                    <li class="contact-item">
+                        <p class="app-meta">{{ contact.get_label_display }}</p>
+                        <h3>{{ contact.name }}</h3>
+                        <div class="contact-actions">
+                            {% if contact.phone %}
+                                <a class="button button-small" href="{{ contact.phone_link }}">Call {{ contact.phone }}<span class="visually-hidden"> ({{ contact.name }})</span></a>
+                            {% endif %}
+                            {% if contact.email %}
+                                <a class="button button-small button-secondary" href="mailto:{{ contact.email }}">Email<span class="visually-hidden"> {{ contact.name }}</span></a>
+                            {% endif %}
+                        </div>
+                        <p class="app-actions">
+                            <a href="{% url 'contact_edit' contact.pk %}">Edit<span class="visually-hidden"> {{ contact.name }}</span></a>
+                            <a href="{% url 'contact_delete' contact.pk %}">Remove<span class="visually-hidden"> {{ contact.name }}</span></a>
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Add the people and places you might need in a hurry, like your GP, pharmacy, next of kin and care company.</p>
+        {% endif %}
+        <div class="button-row">
+            <a class="button" href="{% url 'contact_add' %}">Add a contact</a>
+            {% if not contacts %}
+                <a class="button button-secondary" href="{% url 'contact_add' %}?label=gp">Add my GP</a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock content %}
