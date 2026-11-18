@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block head_title %}Care diary{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Care diary</h1>
+        <p class="lead">Keep a simple daily record of the care you get at home.</p>
+        <p>Each day, answer four quick questions: was your carer on time, were you treated with kindness, did you get your medication, and did you get help with food, washing and dressing. Add a rating and any notes.</p>
+        <p>If something goes wrong, your diary shows exactly what happened and when, and AppWheel tells you who to go to.</p>
+
+        <div class="privacy-note">
+            <h2>Before you start</h2>
+            <ul class="plain-list">
+                <li>Your diary is about your health and care, so it's private and only you can see it.</li>
+                <li>AppWheel never sends it to anyone. You decide who to share it with.</li>
+                <li>You can delete any entry, or your whole diary, at any time.</li>
+            </ul>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="button">Start my care diary</button>
+        </form>
+        <p><a href="{% url 'home' %}">Not now</a></p>
+    </section>
+{% endblock content %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block head_title %}Care diary history{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>My care diary</h1>
+        <p class="lead">Every day you've recorded. Days with a <span class="concern-dot" aria-hidden="true"></span> red dot had a "No" or "Poor".</p>
+        <p><a class="button" href="{% url 'care_today' %}">Write today's entry</a></p>
+
+        <h2 class="section-heading">Download as a PDF</h2>
+        <p>To send to a care manager, social worker, family member or the regulator.</p>
+        <form method="get" action="{% url 'care_download' %}" class="download-form" novalidate>
+            {{ download_form.non_field_errors }}
+            <div class="date-pair">
+                {% for field in download_form %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field.errors }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="button button-secondary">Download PDF</button>
+        </form>
+
+        <h2 class="section-heading">Past entries</h2>
+        {% if entries %}
+            <ul class="diary-list">
+                {% for entry in entries %}
+                    <li class="diary-item{% if entry.has_concern %} has-concern{% endif %}">
+                        <div class="diary-top">
+                            <h3>
+                                {% if entry.has_concern %}<span class="concern-dot" aria-hidden="true"></span><span class="visually-hidden">Concern: </span>{% endif %}
+                                {{ entry.date|date:"D j M Y" }}
+                            </h3>
+                            {% if entry.rating %}<span class="rating rating-{{ entry.rating }}">{{ entry.get_rating_display }}</span>{% endif %}
+                        </div>
+                        <ul class="diary-answers">
+                            {% for question, answer in entry.answers %}
+                                <li><span>{{ question }}</span> <strong{% if answer == 'No' %} class="answer-no"{% endif %}>{{ answer }}</strong></li>
+                            {% endfor %}
+                        </ul>
+                        {% if entry.notes %}<p class="diary-notes">{{ entry.notes|linebreaksbr }}</p>{% endif %}
+                        <p class="app-actions">
+                            <a href="{% url 'care_today' %}?date={{ entry.date|date:'Y-m-d' }}">Change<span class="visually-hidden"> {{ entry.date|date:"j F" }}</span></a>
+                            <a href="{% url 'entry_delete' entry.pk %}">Delete<span class="visually-hidden"> {{ entry.date|date:"j F" }}</span></a>
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No entries yet.</p>
+        {% endif %}
+
+        <p class="help-text"><a href="{% url 'care_help' %}">Not happy with your care? Where to get help</a> · <a href="{% url 'diary_delete' %}">Delete my whole care diary</a></p>
+    </section>
+{% endblock content %}

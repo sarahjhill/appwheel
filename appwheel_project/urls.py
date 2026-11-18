@@ -12,6 +12,8 @@ urlpatterns = [
     path('apps/', include('wheel.urls')),
     # Reminders: trials, renewals, appointments and prescriptions
     path('reminders/', include('reminders.urls')),
+    # Care diary
+    path('care/', include('care.urls')),
     # The main app pages
     path('', include('core.urls')),
 ]

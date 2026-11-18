@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block head_title %}Delete diary entry{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Delete your entry for {{ entry.date|date:"j F Y" }}?</h1>
+        <p>This can't be undone.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="button button-danger">Yes, delete it</button>
+        </form>
+        <p><a href="{% url 'care_history' %}">No, keep it</a></p>
+    </section>
+{% endblock content %}

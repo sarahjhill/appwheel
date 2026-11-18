@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block head_title %}Care diary{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>{% if is_today %}Today's care{% else %}Care on {{ day|date:"l j F" }}{% endif %}</h1>
+        <p class="lead">{{ day|date:"l j F Y" }}{% if entry %} · saved{% endif %}</p>
+        <nav class="day-nav" aria-label="Change day">
+            <a href="?date={{ yesterday }}">‹ Day before</a>
+            {% if next_day %}<a href="?date={{ next_day }}">Day after ›</a>{% endif %}
+            <a href="{% url 'care_history' %}">All entries</a>
+        </nav>
+
+        <form method="post" novalidate id="saved">
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.name == 'notes' %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">Anything else? <span class="optional">(optional)</span></label>
+                        {{ field.errors }}
+                        {{ field }}
+                    </div>
+                {% else %}
+                    <fieldset class="choice-group">
+                        <legend>{{ field.label }}</legend>
+                        {{ field.errors }}
+                        <div class="choices">
+                            {% for radio in field %}
+                                <label class="choice choice-{{ radio.data.value }}">
+                                    {{ radio.tag }}<span>{{ radio.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+                {% endif %}
+            {% endfor %}
+            <button type="submit" class="button">{% if entry %}Save changes{% elif is_today %}Save today's entry{% else %}Save this day{% endif %}</button>
+        </form>
+    </section>
+
+    {% if entry.has_concern %}
+        <div class="card not-happy-card">{% include "care/_not_happy.html" %}</div>
+    {% else %}
+        <p class="care-help-link"><a href="{% url 'care_help' %}">Not happy with your care? Where to get help</a></p>
+    {% endif %}
+{% endblock content %}

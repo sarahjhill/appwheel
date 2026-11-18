@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head_title %}Delete my care diary{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Delete your whole care diary?</h1>
+        <p>This permanently deletes all {{ count }} entr{{ count|pluralize:"y,ies" }}. It can't be undone. If you might need them, <a href="{% url 'care_history' %}">download a PDF</a> first.</p>
+        <form method="post">
+            {% csrf_token %}
+            <label for="confirm">Type <strong>DELETE</strong> to confirm</label>
+            <input id="confirm" name="confirm" type="text" autocomplete="off" required>
+            <button type="submit" class="button button-danger">Delete my care diary</button>
+        </form>
+        <p><a href="{% url 'care_history' %}">No, take me back</a></p>
+    </section>
+{% endblock content %}
