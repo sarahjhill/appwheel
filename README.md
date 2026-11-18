@@ -14,6 +14,22 @@ AppWheel shows every app and subscription you pay for on one spinning wheel. Eac
 - **Care diary** – log the care you receive each day, and find out who to send it to if something goes wrong
 - **Help and contacts** – emergency and important numbers, one tap away
 
+## Accessibility
+
+AppWheel is built for people who are often overlooked, so it aims to meet **WCAG 2.2 AA**.
+
+Checked in November 2026 (issue #28):
+
+- **Automated check** with axe-core on all 26 pages at phone size: no problems found
+- **Keyboard:** every control can be reached with Tab and shows a clear focus outline; the wheel turns with the left and right arrow keys; app cards open as dialogs, close with Escape and return focus to where you were
+- **Screen readers:** every app on the wheel is a real button with a full label (for example "Netflix, £12.99 a month, good value"); the selected app is announced; headings are in order on every page
+- **Colour:** text meets contrast requirements, and the traffic lights always show a symbol (✓ ! ✕) as well as a colour
+- **Zoom and small screens:** nothing scrolls sideways at 320px wide (the same as 400% zoom on a laptop)
+- **Tap targets:** buttons and links are at least 24 by 24 pixels, most are 44 or more
+- **Motion:** the wheel doesn't spin for people who turn on "reduce motion" on their device
+
+Still to do with real people: testing with VoiceOver (iPhone) and TalkBack (Android), and with disabled testers.
+
 ## Tech stack
 
 - Python and Django

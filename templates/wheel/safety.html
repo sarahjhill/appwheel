@@ -5,7 +5,7 @@
         <h1>{{ subscription.name }}: safety and privacy</h1>
         <p class="lead">Short guides to stay in control of your account.</p>
         {% with common_app=subscription.common_app %}
-            {% include "wheel/_safety_guides.html" %}
+            {% include "wheel/_safety_guides.html" with heading="h2" %}
         {% endwith %}
         <p><a href="{% url 'subscription_list' %}">Back to my apps</a></p>
     </section>
