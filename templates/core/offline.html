@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block head_title %}You're offline{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>You're offline</h1>
+        <p class="lead">AppWheel needs the internet to show your apps, reminders and care diary.</p>
+        <p>For your privacy, none of your details are saved on this device. Check your Wi-Fi or mobile data, then try again.</p>
+        <p><a class="button" href="/">Try again</a></p>
+        <h2>In an emergency</h2>
+        <p><a class="call-card call-urgent" href="tel:999"><span class="call-number">999</span><span class="call-text"><strong>Emergency services</strong><span>You can still call without the internet.</span></span></a></p>
+    </section>
+{% endblock content %}

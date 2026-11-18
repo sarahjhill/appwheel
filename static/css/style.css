@@ -514,3 +514,6 @@ input[type="tel"] {
 .guide-body { padding: 0.25rem 1rem 0.75rem; }
 .guide-body p { margin: 0.5rem 0; }
 .kind-privacy .kind-dot { background: var(--accent); }
+
+/* Install page */
+.install-icon { display: block; border-radius: 22px; margin-bottom: 1rem; }

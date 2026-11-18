@@ -72,3 +72,35 @@ class WheelPageTests(TestCase):
         response = self.client.get(reverse('home'))
         names = [app.name for app in response.context['apps']]
         self.assertEqual(names, ['Mine'])
+
+
+class InstallableAppTests(TestCase):
+    def test_manifest_has_name_icons_and_full_screen(self):
+        response = self.client.get(reverse('manifest'))
+        self.assertEqual(response['Content-Type'], 'application/manifest+json')
+        data = response.json()
+        self.assertEqual(data['name'], 'AppWheel')
+        self.assertEqual(data['display'], 'standalone')
+        sizes = {icon['sizes'] for icon in data['icons']}
+        self.assertEqual(sizes, {'192x192', '512x512'})
+        self.assertTrue(any(icon.get('purpose') == 'maskable' for icon in data['icons']))
+
+    def test_service_worker_is_served_from_the_top_of_the_site(self):
+        response = self.client.get('/sw.js')
+        self.assertEqual(response['Content-Type'], 'application/javascript')
+        self.assertEqual(response['Service-Worker-Allowed'], '/')
+        self.assertContains(response, "const OFFLINE_URL = '/offline/'")
+
+    def test_service_worker_never_saves_private_pages(self):
+        script = self.client.get('/sw.js').content.decode()
+        for private in ['/apps/', '/reminders/', '/care/', '/help/', '/accounts/']:
+            self.assertNotIn(f"'{private}'", script)
+
+    def test_offline_and_install_pages_work_without_logging_in(self):
+        self.assertContains(self.client.get(reverse('offline')), "You're offline")
+        self.assertContains(self.client.get(reverse('install')), 'Add to Home Screen')
+
+    def test_every_page_links_the_manifest_and_icon(self):
+        response = self.client.get(reverse('account_login'))
+        self.assertContains(response, 'rel="manifest"')
+        self.assertContains(response, 'apple-touch-icon')

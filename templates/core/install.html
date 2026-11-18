@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+{% block head_title %}Put AppWheel on your phone{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <img class="install-icon" src="{% static 'icons/icon-192.png' %}" alt="" width="96" height="96">
+        <h1>Put AppWheel on your phone</h1>
+        <p class="lead">Add it to your home screen and it opens like any other app, full screen.</p>
+
+        <button type="button" class="button" data-install hidden>Install AppWheel</button>
+
+        <h2>iPhone or iPad</h2>
+        <ol class="steps">
+            <li>Open AppWheel in <strong>Safari</strong>.</li>
+            <li>Tap the <strong>Share</strong> button (the square with an arrow pointing up).</li>
+            <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+            <li>Tap <strong>Add</strong>.</li>
+        </ol>
+
+        <h2>Android</h2>
+        <ol class="steps">
+            <li>Open AppWheel in <strong>Chrome</strong>.</li>
+            <li>Tap the <strong>menu</strong> (three dots, top right).</li>
+            <li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+        </ol>
+
+        <p class="help-text">For your privacy, your apps, reminders and care diary are never saved on the phone itself. You'll need the internet to see them.</p>
+        <p><a href="{% url 'home' %}">Back to my wheel</a></p>
+    </section>
+{% endblock content %}

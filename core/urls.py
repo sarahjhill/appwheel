@@ -4,4 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('manifest.webmanifest', views.manifest, name='manifest'),
+    path('sw.js', views.service_worker, name='service_worker'),
+    path('offline/', views.offline, name='offline'),
+    path('install/', views.install, name='install'),
 ]

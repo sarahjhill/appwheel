@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.templatetags.static import static
+from django.views.decorators.cache import cache_control
 
 from reminders.automatic import roll_forward_payment_dates
 from wheel.health import summarise
@@ -39,3 +42,54 @@ def _short_name(name):
         return name
     first_word = name.split()[0] if name.split() else name
     return (first_word if len(first_word) >= 3 else name)[:8]
+
+
+# ----- Installable app (PWA) -----
+
+@cache_control(max_age=86400)
+def manifest(request):
+    """Tells phones the app's name, icon and colours, so it can be added to the home screen."""
+    data = {
+        'name': 'AppWheel',
+        'short_name': 'AppWheel',
+        'description': 'Spins all your apps into control.',
+        'start_url': '/?source=home-screen',
+        'scope': '/',
+        'display': 'standalone',
+        'background_color': '#15112b',
+        'theme_color': '#15112b',
+        'lang': 'en-GB',
+        'icons': [
+            {'src': static('icons/icon-192.png'), 'sizes': '192x192', 'type': 'image/png'},
+            {'src': static('icons/icon-512.png'), 'sizes': '512x512', 'type': 'image/png'},
+            {'src': static('icons/icon-maskable-512.png'), 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'},
+        ],
+    }
+    return JsonResponse(data, content_type='application/manifest+json')
+
+
+@cache_control(no_cache=True)
+def service_worker(request):
+    """The service worker must be served from the top of the site so it covers every page."""
+    response = render(request, 'core/sw.js', {
+        'offline_url': '/offline/',
+        'files': [
+            '/offline/',
+            static('css/style.css'),
+            static('js/wheel.js'),
+            static('js/pwa.js'),
+            static('icons/icon-192.png'),
+        ],
+    }, content_type='application/javascript')
+    response['Service-Worker-Allowed'] = '/'
+    return response
+
+
+def offline(request):
+    """Shown when the phone has no signal."""
+    return render(request, 'core/offline.html')
+
+
+def install(request):
+    """How to put AppWheel on your phone's home screen."""
+    return render(request, 'core/install.html')
