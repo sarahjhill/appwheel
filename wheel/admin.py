@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CommonApp, CommonAppPlan, Subscription
+from .models import CommonApp, CommonAppPlan, SafetyGuide, Subscription
 
 
 @admin.register(Subscription)
@@ -26,3 +26,14 @@ class CommonAppAdmin(admin.ModelAdmin):
     @admin.display(description='plans')
     def plan_count(self, common_app):
         return common_app.plans.count()
+
+
+@admin.register(SafetyGuide)
+class SafetyGuideAdmin(admin.ModelAdmin):
+    list_display = ('title', 'common_app', 'has_steps', 'last_checked')
+    list_filter = ('common_app', 'last_checked')
+    search_fields = ('title', 'common_app__name')
+
+    @admin.display(boolean=True, description='steps added')
+    def has_steps(self, guide):
+        return bool(guide.steps.strip())

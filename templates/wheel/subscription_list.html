@@ -67,6 +67,7 @@
                             {% endif %}
                             <p class="app-actions">
                                 {% if subscription.price %}<a href="{% url 'cancel_help' subscription.pk %}">Cancel<span class="visually-hidden"> {{ subscription.name }}</span> with help</a>{% endif %}
+                                {% if subscription.common_app.safety_guides.exists %}<a href="{% url 'safety_guides' subscription.pk %}">Safety &amp; privacy<span class="visually-hidden"> for {{ subscription.name }}</span></a>{% endif %}
                                 <a href="{% url 'subscription_edit' subscription.pk %}">Edit<span class="visually-hidden"> {{ subscription.name }}</span></a>
                                 <a href="{% url 'subscription_delete' subscription.pk %}">Remove<span class="visually-hidden"> {{ subscription.name }}</span></a>
                             </p>

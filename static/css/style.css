@@ -506,3 +506,11 @@ input[type="tel"] {
 .contact-item h3 { margin: 0.1rem 0 0.5rem; }
 .contact-item .app-meta { margin: 0; }
 .contact-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* Safety & privacy guides */
+.safety-guides { margin: 1rem 0; }
+.safety-heading { display: flex; align-items: center; gap: 0.4rem; color: var(--text); }
+.safety-heading svg { color: var(--accent); }
+.guide-body { padding: 0.25rem 1rem 0.75rem; }
+.guide-body p { margin: 0.5rem 0; }
+.kind-privacy .kind-dot { background: var(--accent); }

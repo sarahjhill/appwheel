@@ -135,6 +135,8 @@
                         </ul>
                     {% endif %}
 
+                    {% if app.common_app %}{% with common_app=app.common_app %}{% include "wheel/_safety_guides.html" %}{% endwith %}{% endif %}
+
                     <div class="button-row">
                         {% if app.price %}<a class="button" href="{% url 'cancel_help' app.pk %}">Cancel with help</a>{% endif %}
                         <a class="button button-secondary" href="{% url 'subscription_edit' app.pk %}">Edit details</a>

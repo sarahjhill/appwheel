@@ -1,0 +1,25 @@
+{% with guides=common_app.safety_guides.all %}
+    {% if guides %}
+        <div class="safety-guides">
+            <h3 class="safety-heading">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg>
+                Safety &amp; privacy
+            </h3>
+            {% for guide in guides %}
+                <details class="pay-route">
+                    <summary>{{ guide.title }}</summary>
+                    <div class="guide-body">
+                        {% if guide.step_list %}
+                            <ol class="steps">{% for step in guide.step_list %}<li>{{ step }}</li>{% endfor %}</ol>
+                        {% else %}
+                            <p>{{ common_app.name }}'s own help page has the up-to-date steps. Search it for "{{ guide.title|lower }}".</p>
+                        {% endif %}
+                        <p><a href="{{ guide.help_url }}" target="_blank" rel="noopener noreferrer">Open {{ common_app.name }}'s official help<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+                        <p class="help-text">Menus change. {% if guide.last_checked %}Last checked: {{ guide.last_checked|date:"j F Y" }}.{% else %}Always check the official help page.{% endif %}</p>
+                    </div>
+                </details>
+            {% endfor %}
+            <p class="help-text">Being harassed, threatened or scammed? If you're in danger, call 999. Otherwise call the police on 101. <a href="{% url 'help_page' %}">More help</a></p>
+        </div>
+    {% endif %}
+{% endwith %}

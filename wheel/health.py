@@ -20,7 +20,7 @@ GREEN, AMBER, RED = 'green', 'amber', 'red'
 SYMBOLS = {GREEN: '✓', AMBER: '!', RED: '✕'}
 LABELS = {GREEN: 'Good value', AMBER: 'Could cost less', RED: 'Needs action'}
 # Categories where having two apps is normal, so we don't flag them
-CATEGORIES_NOT_COMPARED = {'other'}
+CATEGORIES_NOT_COMPARED = {'other', 'social'}
 
 
 @dataclass
@@ -124,9 +124,15 @@ def score_subscription(sub, all_subs, today=None):
                 problems.append((AMBER, 15, f'Paying yearly would cost {money(plan.price)} instead of {money(yearly)}.'))
                 tips.append(Tip(f'Pay yearly to save {money(saving)} a year', saving))
 
+    # Amber: social apps need a privacy check-up each month
+    if sub.category == 'social' and _privacy_checkup_due(sub, today):
+        problems.append((AMBER, 20, 'Privacy check-up due. Take 5 minutes to check who can see your posts.'))
+
     if not problems:
         reason = 'Good value. You use it and there\'s nothing cheaper we know of.'
-        if not sub.price:
+        if sub.category == 'social':
+            reason = 'Your privacy check-up is up to date.'
+        elif not sub.price:
             reason = 'It\'s free, so there\'s nothing to save.'
         score = 100 if sub.usage in ('daily', 'weekly') or not sub.price else 85
         return Health(GREEN, score, reason, tips)
@@ -148,6 +154,12 @@ def _app_to_keep(similar_apps):
 
 def _join_names(names):
     return names[0] if len(names) == 1 else ', '.join(names[:-1]) + ' and ' + names[-1]
+
+
+def _privacy_checkup_due(sub, today):
+    if not sub.user_id:
+        return False
+    return sub.user.reminders.filter(kind='privacy', is_done=False, due_date__lte=today).exists()
 
 
 def _common_app_for(sub):

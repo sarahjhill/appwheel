@@ -72,6 +72,7 @@ def roll_forward_payment_dates(user, today=None):
     and make sure every app's automatic reminders are up to date.
     """
     today = today or date.today()
+    keep_privacy_checkup(user, today)
     for subscription in user.subscriptions.filter(status='active'):
         payment = subscription.next_payment_date
         if payment and payment < today:
@@ -96,3 +97,24 @@ def _add_period(day, billing_period):
             return date(year, month, day_number)
         except ValueError:
             continue
+
+
+def keep_privacy_checkup(user, today=None):
+    """Anyone with a social or messaging app on their wheel gets a monthly privacy check-up."""
+    today = today or date.today()
+    has_social = user.subscriptions.filter(status='active', category='social').exists()
+    waiting = user.reminders.filter(kind=Reminder.Kind.PRIVACY, is_done=False)
+    if has_social and not waiting.exists():
+        Reminder.objects.create(
+            user=user,
+            kind=Reminder.Kind.PRIVACY,
+            title='Monthly privacy check-up',
+            details=(
+                'Take 5 minutes to check who can see your posts and where you\'re logged in. '
+                'Open each social app on your wheel and use its Safety & privacy guides.'
+            ),
+            due_date=today,
+            repeat_every_days=30,
+        )
+    elif not has_social:
+        waiting.delete()

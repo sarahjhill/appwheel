@@ -11,6 +11,7 @@ urlpatterns = [
     path('<int:pk>/cancelled/', views.mark_cancelled, name='mark_cancelled'),
     path('<int:pk>/active/', views.mark_active, name='mark_active'),
     path('<int:pk>/refund/', views.refund_request, name='refund_request'),
+    path('<int:pk>/safety/', views.safety_guides, name='safety_guides'),
     path('upload/', views.statement_upload, name='statement_upload'),
     path('upload/review/', views.statement_review, name='statement_review'),
     path('screenshot/', views.screenshot_upload, name='screenshot_upload'),

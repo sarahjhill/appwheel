@@ -15,7 +15,7 @@ def home(request):
     subscriptions = list(
         request.user.subscriptions.filter(status='active')
         .select_related('common_app')
-        .prefetch_related('common_app__plans')
+        .prefetch_related('common_app__plans', 'common_app__safety_guides')
     )
     summary = summarise(subscriptions)
     # Biggest costs first, so the most important apps are on the wheel

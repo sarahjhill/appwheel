@@ -67,6 +67,8 @@ def subscription_add(request):
             'name': common_app.name,
             'category': common_app.category,
         }
+        if common_app.category == 'social':
+            initial.update({'price': 0, 'usage': 'daily'})  # social apps are usually free
         chosen_plan = common_app.plans.filter(pk=request.GET.get('plan') or 0).first()
         if chosen_plan:
             initial.update({
@@ -297,3 +299,12 @@ def refund_request(request, pk):
     """A ready-written refund request for a payment taken after cancelling."""
     subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
     return render(request, 'wheel/refund_request.html', {'subscription': subscription})
+
+
+@login_required
+def safety_guides(request, pk):
+    """Safety and privacy guides for one social or messaging app."""
+    subscription = get_object_or_404(
+        Subscription.objects.select_related('common_app'), pk=pk, user=request.user,
+    )
+    return render(request, 'wheel/safety.html', {'subscription': subscription})

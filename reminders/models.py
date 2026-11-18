@@ -11,6 +11,7 @@ class Reminder(models.Model):
         RENEWAL = 'renewal', 'Renewal coming up'
         APPOINTMENT = 'appointment', 'Appointment'
         PRESCRIPTION = 'prescription', 'Repeat prescription'
+        PRIVACY = 'privacy', 'Privacy check-up'
         OTHER = 'other', 'Other'
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reminders')

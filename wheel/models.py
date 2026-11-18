@@ -13,6 +13,7 @@ class Category(models.TextChoices):
     BOOKS = 'books', 'Books and audiobooks'
     DESIGN = 'design', 'Design'
     FITNESS = 'fitness', 'Health and fitness'
+    SOCIAL = 'social', 'Social and messaging'
     OTHER = 'other', 'Other'
 
 
@@ -50,6 +51,32 @@ class CommonApp(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SafetyGuide(models.Model):
+    """A short, plain-English guide, like 'Block someone on Instagram'."""
+
+    common_app = models.ForeignKey(CommonApp, on_delete=models.CASCADE, related_name='safety_guides')
+    title = models.CharField(max_length=120)
+    steps = models.TextField(
+        blank=True,
+        help_text='One step per line. Copy them from the official help page, in plain English.',
+    )
+    help_url = models.URLField('official help page')
+    last_checked = models.DateField(
+        null=True, blank=True, help_text='The date you last checked these steps against the official help page.',
+    )
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['common_app', 'position']
+
+    def __str__(self):
+        return f'{self.common_app.name}: {self.title}'
+
+    @property
+    def step_list(self):
+        return [step.strip() for step in self.steps.splitlines() if step.strip()]
 
 
 class CommonAppPlan(models.Model):
