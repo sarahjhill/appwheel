@@ -15,4 +15,5 @@ urlpatterns = [
     path('upload/', views.statement_upload, name='statement_upload'),
     path('upload/review/', views.statement_review, name='statement_review'),
     path('screenshot/', views.screenshot_upload, name='screenshot_upload'),
+    path('paste/', views.paste_text, name='paste_text'),
 ]

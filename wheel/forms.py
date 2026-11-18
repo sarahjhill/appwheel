@@ -73,3 +73,12 @@ class ScreenshotUploadForm(forms.Form):
         if len(screenshots) > 5:
             raise forms.ValidationError('Please choose up to 5 screenshots at a time.')
         return screenshots
+
+
+class PasteTextForm(forms.Form):
+    text = forms.CharField(
+        label='Paste it here',
+        help_text='For example a bill, a renewal email or a letter from a company.',
+        widget=forms.Textarea(attrs={'rows': 10}),
+        max_length=10000,
+    )

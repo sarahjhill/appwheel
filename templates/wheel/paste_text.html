@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block head_title %}Paste a bill or email{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Paste a bill or email</h1>
+        <p class="lead">Copy a bill, a renewal email or a letter from a company, paste it below, and we'll fill in the details for you.</p>
+
+        {% if not is_set_up %}
+            <p class="message message-error">Reading pasted text isn't switched on yet. You can still upload a bank statement or add an app yourself.</p>
+        {% endif %}
+
+        <div class="privacy-note">
+            <h2>What you paste stays private</h2>
+            <ul class="plain-list">
+                <li>Your text is sent securely to our AI reader (Claude, made by Anthropic) so it can read the details. It is not used to train AI.</li>
+                <li>AppWheel never saves what you paste.</li>
+                <li>Only the items you tick on the next page are added.</li>
+                <li>Tip: you can delete account numbers before you paste. We don't need them.</li>
+            </ul>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="button"{% if not is_set_up %} disabled{% endif %}>Read it for me</button>
+        </form>
+        <p class="help-text">Reading can take up to 20 seconds.</p>
+
+        <p><a href="{% url 'subscription_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}

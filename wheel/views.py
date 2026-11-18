@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from . import screenshot
 from .health import summarise
-from .forms import ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
+from .forms import PasteTextForm, ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
 from reminders.models import Reminder
 
 from .models import CommonApp, Subscription, link_common_apps
@@ -224,6 +224,30 @@ def screenshot_upload(request):
                 'Try a screenshot of your Subscriptions page.',
             )
     return render(request, 'wheel/screenshot_upload.html', {
+        'form': form,
+        'is_set_up': screenshot.is_set_up(),
+    })
+
+
+@login_required
+def paste_text(request):
+    """Paste in a bill or email. AI reads it; the text is never saved."""
+    form = PasteTextForm(request.POST or None)
+    if request.method == 'POST' and screenshot.is_set_up() and form.is_valid():
+        try:
+            found = screenshot.read_pasted_text(form.cleaned_data['text'])
+        except screenshot.ScreenshotError as error:
+            form.add_error('text', str(error))
+        else:
+            if found:
+                request.session[SESSION_KEY] = found
+                return redirect('statement_review')
+            form.add_error(
+                'text',
+                "We couldn't find any subscriptions or bills in that. "
+                'Try pasting a bill or a renewal email.',
+            )
+    return render(request, 'wheel/paste_text.html', {
         'form': form,
         'is_set_up': screenshot.is_set_up(),
     })

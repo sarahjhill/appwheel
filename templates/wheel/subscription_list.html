@@ -8,6 +8,7 @@
             <a class="button" href="{% url 'statement_upload' %}">Upload bank statements</a>
             {% if screenshots_ready %}
                 <a class="button" href="{% url 'screenshot_upload' %}">Upload a screenshot</a>
+                <a class="button" href="{% url 'paste_text' %}">Paste a bill or email</a>
             {% endif %}
             <a class="button button-secondary" href="{% url 'subscription_add' %}">Add an app myself</a>
         </div>
