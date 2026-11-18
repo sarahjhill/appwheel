@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block head_title %}Ask AppWheel{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Ask AppWheel</h1>
+        <p class="lead">Ask anything about your bills, contracts, contacts or everyday life admin.</p>
+
+        {% if not is_set_up %}
+            <p class="message message-error">Ask AppWheel isn't switched on yet.</p>
+        {% endif %}
+
+        {% if history %}
+            <div class="ask-conversation" aria-live="polite">
+                {% for turn in history %}
+                    {% if turn.role == 'user' %}
+                        <p class="ask-question"><strong>You asked:</strong> {{ turn.content }}</p>
+                    {% else %}
+                        <div class="ask-answer">
+                            {{ turn.content|linebreaks }}
+                            {% if turn.sources %}
+                                <p class="help-text">Where this came from:</p>
+                                <ul class="ask-sources">
+                                    {% for source in turn.sources %}
+                                        <li><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <form method="post" action="{% url 'ask_clear' %}">
+                {% csrf_token %}
+                <button type="submit" class="button button-secondary">Start a new conversation</button>
+            </form>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="field">
+                <label for="question">Your question</label>
+                {% if error %}<p class="message message-error" role="alert">{{ error }}</p>{% endif %}
+                <textarea id="question" name="question" rows="3" maxlength="1000">{{ question }}</textarea>
+            </div>
+            <button type="submit" class="button"{% if not is_set_up %} disabled{% endif %}>Ask</button>
+            <p class="help-text">Answers can take up to 30 seconds.</p>
+        </form>
+
+        <h2>Not sure what to ask? Tap one:</h2>
+        <form method="post" class="ask-suggestions">
+            {% csrf_token %}
+            {% for suggestion in suggestions %}
+                <button type="submit" name="question" value="{{ suggestion }}" class="ask-chip"{% if not is_set_up %} disabled{% endif %}>{{ suggestion }}</button>
+            {% endfor %}
+        </form>
+
+        <div class="privacy-note">
+            <h2>How Ask AppWheel works</h2>
+            <ul class="plain-list">
+                <li>Your question, your apps and your saved contacts are sent securely to our AI helper (Claude, made by Anthropic) so it can answer. They are not used to train AI.</li>
+                <li>It searches the web for things like council numbers, and shows where the answer came from.</li>
+                <li>Answers are general information, not professional advice. For anything complicated, contact <a href="https://www.citizensadvice.org.uk/" target="_blank" rel="noopener noreferrer">Citizens Advice</a>.</li>
+                <li>In an emergency, call 999.</li>
+            </ul>
+        </div>
+    </section>
+{% endblock content %}

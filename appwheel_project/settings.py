@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     # AppWheel's own apps
     'core',
+    'assistant',
     'accounts',
     'wheel',
     'reminders',

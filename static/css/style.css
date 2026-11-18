@@ -700,3 +700,17 @@ body.cal-is-open .cal-tab { visibility: hidden; }
 .email-setting { margin: 1rem 0; padding: 0.9rem 1rem; border-radius: 0.9rem; background: #1b1636; border: 1px solid var(--line); }
 .switch-label { display: flex; gap: 0.75rem; align-items: flex-start; margin: 0 0 0.6rem; font-weight: 400; cursor: pointer; }
 .switch-label .help-text { margin: 0; }
+
+/* Ask AppWheel */
+.ask-conversation { display: grid; gap: 0.75rem; margin: 1rem 0; }
+.ask-question { margin: 0; padding: 0.75rem 1rem; border-radius: 12px; background: rgba(196, 181, 253, 0.12); }
+.ask-answer { padding: 0.75rem 1rem; border-radius: 12px; border: 2px solid var(--accent); }
+.ask-answer p:first-child { margin-top: 0; }
+.ask-sources { margin: 0.25rem 0 0; padding-left: 1.25rem; }
+.ask-suggestions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.ask-chip {
+    min-height: 44px; padding: 0.5rem 1rem; border-radius: 999px; cursor: pointer;
+    background: transparent; color: var(--text); border: 2px solid var(--accent); font: inherit;
+}
+.ask-chip:hover, .ask-chip:focus-visible { background: var(--accent); color: #fff; }
+.ask-chip:disabled { opacity: 0.5; cursor: not-allowed; }

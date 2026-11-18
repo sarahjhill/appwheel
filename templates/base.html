@@ -41,13 +41,14 @@
         {% endif %}
     </header>
     {% if user.is_authenticated %}
-        {% url 'home' as home_url %}{% url 'subscription_list' as apps_url %}{% url 'reminder_list' as reminders_url %}{% url 'care_today' as care_url %}{% url 'help_page' as help_url %}
+        {% url 'home' as home_url %}{% url 'subscription_list' as apps_url %}{% url 'reminder_list' as reminders_url %}{% url 'care_today' as care_url %}{% url 'help_page' as help_url %}{% url 'ask_page' as ask_url %}
         <nav class="main-nav" aria-label="Main">
             <a href="{{ home_url }}"{% if request.path == home_url %} aria-current="page"{% endif %}>Wheel</a>
             <a href="{{ apps_url }}"{% if request.path == apps_url %} aria-current="page"{% endif %}>Apps</a>
             <a href="{{ reminders_url }}"{% if request.path == reminders_url %} aria-current="page"{% endif %}>Reminders</a>
             <a href="{{ care_url }}"{% if care_url in request.path %} aria-current="page"{% endif %}>Care</a>
             <a href="{{ help_url }}"{% if help_url in request.path %} aria-current="page"{% endif %}>Help</a>
+            <a href="{{ ask_url }}"{% if ask_url in request.path %} aria-current="page"{% endif %}>Ask</a>
         </nav>
     {% endif %}
 
