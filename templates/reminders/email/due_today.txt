@@ -1,0 +1,10 @@
+Hello,
+
+Here's what's on today in AppWheel:
+{% for reminder in reminders %}
+- {{ reminder.title }}{% if reminder.time %} at {{ reminder.time|time:"g:i A"|lower }}{% endif %}{% if reminder.due_date < today %} (from {{ reminder.due_date|date:"j M" }}){% endif %}{% endfor %}
+
+See your reminders: {{ reminders_url }}
+
+You're getting this because reminder emails are switched on.
+Turn them off on your Account page: {{ account_url }}

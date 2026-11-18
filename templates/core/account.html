@@ -4,6 +4,16 @@
     <section class="card">
         <h1>My account</h1>
         <p class="lead">Signed in as <strong>{{ user.email }}</strong></p>
+        <form method="post" action="{% url 'reminder_email_settings' %}" class="email-setting">
+            {% csrf_token %}
+            <label class="switch-label">
+                <input type="checkbox" name="reminder_emails"{% if reminder_emails %} checked{% endif %}>
+                <span><strong>Email me my reminders</strong><br>
+                <span class="help-text">One email on days when something's due. No marketing, ever.</span></span>
+            </label>
+            <button type="submit" class="button button-small button-secondary">Save</button>
+        </form>
+
         <ul class="account-menu">
             <li><a href="{% url 'account_change_password' %}">Change my password</a></li>
             <li><a href="{% url 'account_email' %}">Manage my email</a></li>

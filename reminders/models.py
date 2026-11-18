@@ -28,6 +28,7 @@ class Reminder(models.Model):
         'wheel.Subscription', on_delete=models.SET_NULL, null=True, blank=True, related_name='reminders',
     )
     is_done = models.BooleanField(default=False)
+    emailed_on = models.DateField(null=True, blank=True)  # so each reminder is only emailed once
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Made automatically from an app's dates, so they're kept in step with the app
@@ -57,3 +58,22 @@ class ChecklistItem(models.Model):
 
     def __str__(self):
         return self.text
+
+
+
+class EmailSettings(models.Model):
+    """Whether the user wants a reminder email on days when something is due."""
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='email_settings')
+    reminder_emails = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = 'email settings'
+
+    def __str__(self):
+        return f'{self.user}: reminder emails {"on" if self.reminder_emails else "off"}'
+
+    @classmethod
+    def wants_emails(cls, user):
+        settings_row = cls.objects.filter(user=user).first()
+        return settings_row.reminder_emails if settings_row else True

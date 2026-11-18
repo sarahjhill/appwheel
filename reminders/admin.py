@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ChecklistItem, Reminder
+from .models import ChecklistItem, EmailSettings, Reminder
 
 
 class ChecklistItemInline(admin.TabularInline):
@@ -14,3 +14,6 @@ class ReminderAdmin(admin.ModelAdmin):
     list_filter = ('kind', 'is_done')
     search_fields = ('title', 'user__email')
     inlines = [ChecklistItemInline]
+
+
+admin.site.register(EmailSettings)

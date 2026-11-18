@@ -9,7 +9,7 @@ from django.urls import reverse
 
 from .automatic import roll_forward_payment_dates
 from .forms import DEFAULT_CHECKLIST, ReminderForm
-from .models import ChecklistItem, Reminder
+from .models import ChecklistItem, EmailSettings, Reminder
 
 NHS_APP_URL = 'https://www.nhs.uk/nhs-app/'
 STARTING_TITLES = {
@@ -174,3 +174,13 @@ def reminder_calendar(request):
         'days': days,
         'add_url': reverse('reminder_add'),
     })
+
+
+@login_required
+def email_settings(request):
+    """Switch reminder emails on or off."""
+    if request.method == 'POST':
+        wanted = request.POST.get('reminder_emails') == 'on'
+        EmailSettings.objects.update_or_create(user=request.user, defaults={'reminder_emails': wanted})
+        messages.success(request, f'Reminder emails are now {"on" if wanted else "off"}.')
+    return redirect('account')

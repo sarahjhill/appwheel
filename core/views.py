@@ -49,7 +49,10 @@ def _short_name(name):
 @login_required
 def account(request):
     """Account settings: password, email, installing the app, deleting the account."""
-    return render(request, 'core/account.html')
+    from reminders.models import EmailSettings
+    return render(request, 'core/account.html', {
+        'reminder_emails': EmailSettings.wants_emails(request.user),
+    })
 
 
 # ----- Installable app (PWA) -----

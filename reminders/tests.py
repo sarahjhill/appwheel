@@ -218,3 +218,75 @@ class CalendarPanelTests(TestCase):
     def test_add_a_reminder_for_a_chosen_day(self):
         response = self.client.get(reverse('reminder_add'), {'kind': 'other', 'date': '2027-03-09'})
         self.assertContains(response, 'value="2027-03-09"')
+
+
+class ReminderEmailTests(TestCase):
+    def setUp(self):
+        from django.core import mail
+        self.mail = mail
+        self.user = make_user()
+
+    def run_command(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+        output = StringIO()
+        call_command('send_reminder_emails', stdout=output)
+        return output.getvalue()
+
+    def test_reminders_due_today_are_emailed_in_one_email(self):
+        Reminder.objects.create(user=self.user, title='GP appointment', due_date=TODAY)
+        Reminder.objects.create(user=self.user, title='Order prescription', due_date=TODAY - timedelta(days=1))
+        Reminder.objects.create(user=self.user, title='Next week thing', due_date=TODAY + timedelta(days=7))
+        self.assertIn('Sent 1 reminder email(s).', self.run_command())
+        self.assertEqual(len(self.mail.outbox), 1)
+        email = self.mail.outbox[0]
+        self.assertEqual(email.to, ['sam@example.com'])
+        self.assertEqual(email.subject, 'AppWheel: 2 reminders for today')
+        self.assertIn('GP appointment', email.body)
+        self.assertIn('Order prescription', email.body)
+        self.assertNotIn('Next week thing', email.body)
+        self.assertIn('/account/', email.body)
+
+    def test_each_reminder_is_only_emailed_once(self):
+        Reminder.objects.create(user=self.user, title='GP appointment', due_date=TODAY)
+        self.run_command()
+        self.run_command()
+        self.assertEqual(len(self.mail.outbox), 1)
+
+    def test_done_reminders_are_not_emailed(self):
+        Reminder.objects.create(user=self.user, title='Done already', due_date=TODAY, is_done=True)
+        self.run_command()
+        self.assertEqual(len(self.mail.outbox), 0)
+
+    def test_no_emails_when_switched_off(self):
+        from .models import EmailSettings
+        EmailSettings.objects.create(user=self.user, reminder_emails=False)
+        Reminder.objects.create(user=self.user, title='GP appointment', due_date=TODAY)
+        self.run_command()
+        self.assertEqual(len(self.mail.outbox), 0)
+
+    def test_a_trial_ending_in_2_days_creates_a_reminder_and_an_email_arrives(self):
+        # The "done when" test from the build plan
+        Subscription.objects.create(
+            user=self.user, name='Headway', price=Decimal('9.99'), trial_end_date=TODAY + timedelta(days=2),
+        )
+        self.run_command()
+        self.assertEqual(len(self.mail.outbox), 1)
+        self.assertIn('Headway free trial ends', self.mail.outbox[0].body)
+
+    def test_each_person_only_gets_their_own_reminders(self):
+        Reminder.objects.create(user=self.user, title='Mine', due_date=TODAY)
+        Reminder.objects.create(user=make_user('alex'), title='Alex private', due_date=TODAY)
+        self.run_command()
+        mine = next(email for email in self.mail.outbox if email.to == ['sam@example.com'])
+        self.assertNotIn('Alex private', mine.body)
+
+    def test_switching_emails_off_and_on_from_the_account_page(self):
+        from .models import EmailSettings
+        self.client.force_login(self.user)
+        self.assertContains(self.client.get(reverse('account')), 'Email me my reminders')
+        self.client.post(reverse('reminder_email_settings'), {})
+        self.assertFalse(EmailSettings.wants_emails(self.user))
+        self.client.post(reverse('reminder_email_settings'), {'reminder_emails': 'on'})
+        self.assertTrue(EmailSettings.wants_emails(self.user))

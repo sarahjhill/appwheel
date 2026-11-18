@@ -697,3 +697,6 @@ body.cal-is-open .cal-tab { visibility: hidden; }
     .todo-tab, .cal-tab { padding: 0.7rem 0.3rem; min-width: 2rem; font-size: 0.75rem; gap: 0.3rem; }
     .todo-tab .todo-count, .cal-tab .todo-count { min-width: 1.3rem; height: 1.3rem; font-size: 0.7rem; }
 }
+.email-setting { margin: 1rem 0; padding: 0.9rem 1rem; border-radius: 0.9rem; background: #1b1636; border: 1px solid var(--line); }
+.switch-label { display: flex; gap: 0.75rem; align-items: flex-start; margin: 0 0 0.6rem; font-weight: 400; cursor: pointer; }
+.switch-label .help-text { margin: 0; }

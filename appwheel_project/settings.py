@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,6 +36,13 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     host for host in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host
 ]
+
+# The live site's address, e.g. https://appwheel-xxxx.herokuapp.com (used in emails and forms)
+SITE_URL = os.environ.get("SITE_URL", "http://127.0.0.1:8000").rstrip("/")
+CSRF_TRUSTED_ORIGINS = [SITE_URL] if SITE_URL.startswith("https://") else []
+
+# True while the tests are running
+TESTING = "test" in sys.argv
 
 
 # Application definition
@@ -63,6 +72,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Serves the CSS, JavaScript and icons on Heroku
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -97,11 +108,12 @@ WSGI_APPLICATION = 'appwheel_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# On your Mac: the SQLite file. On Heroku: the PostgreSQL database in DATABASE_URL.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 
@@ -141,6 +153,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise gives each file a unique name when it changes, so browsers never use old styles
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage' if DEBUG or TESTING
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -168,11 +192,33 @@ LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'home'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 
-# While building on your Mac, emails (like password resets)
-# are printed in the terminal instead of being sent.
-if DEBUG:
+# Emails (password resets and reminders).
+# On your Mac they're printed in the terminal. On Heroku they're sent through
+# the email service whose details are in the EMAIL_... settings.
+if os.environ.get("EMAIL_HOST"):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ["EMAIL_HOST"]
+    EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+    EMAIL_TIMEOUT = 20
+else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'AppWheel <hello@appwheel.local>'
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "AppWheel <hello@appwheel.local>")
+
+# ---------------------------------------------------------------
+# Security on the live site (these switch on when DEBUG is False)
+# ---------------------------------------------------------------
+if not DEBUG and not TESTING:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Heroku uses HTTPS
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600  # raise to 31536000 (a year) once everything works
+    SECURE_REFERRER_POLICY = 'same-origin'
+    X_FRAME_OPTIONS = 'DENY'
+SESSION_COOKIE_HTTPONLY = True
 
 # ---------------------------------------------------------------
 # Sign in with Google

@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.reminder_list, name='reminder_list'),
     path('add/', views.reminder_add, name='reminder_add'),
     path('calendar/', views.reminder_calendar, name='reminder_calendar'),
+    path('emails/', views.email_settings, name='reminder_email_settings'),
     path('<int:pk>/edit/', views.reminder_edit, name='reminder_edit'),
     path('<int:pk>/done/', views.reminder_done, name='reminder_done'),
     path('<int:pk>/delete/', views.reminder_delete, name='reminder_delete'),
