@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block head_title %}Reminders{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>Reminders</h1>
+        <p class="lead">Everything coming up, in one place.</p>
+        <div class="button-row">
+            <a class="button" href="{% url 'reminder_add' %}?kind=appointment">Add an appointment</a>
+            <a class="button button-secondary" href="{% url 'reminder_add' %}?kind=prescription">Add a repeat prescription</a>
+            <a class="button button-secondary" href="{% url 'reminder_add' %}?kind=other">Add something else</a>
+        </div>
+
+        <h2 class="section-heading">This week</h2>
+        {% if this_week %}
+            <ul class="reminder-list">
+                {% for reminder in this_week %}{% include "reminders/_reminder.html" %}{% endfor %}
+            </ul>
+        {% else %}
+            <p>Nothing this week. Free trials ending and payments coming up will appear here automatically.</p>
+        {% endif %}
+
+        {% if later %}
+            <h2 class="section-heading">Later</h2>
+            <ul class="reminder-list">
+                {% for reminder in later %}{% include "reminders/_reminder.html" %}{% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if done %}
+            <details class="done-reminders">
+                <summary>Done ({{ done|length }})</summary>
+                <ul class="reminder-list">
+                    {% for reminder in done %}{% include "reminders/_reminder.html" %}{% endfor %}
+                </ul>
+            </details>
+        {% endif %}
+    </section>
+{% endblock content %}
+
+{% block extra_body %}
+<script>
+    /* Ticking a box saves it straight away. */
+    document.querySelectorAll('[data-autosubmit]').forEach(function (box) {
+        box.addEventListener('change', function () { box.form.submit(); });
+    });
+</script>
+{% endblock extra_body %}

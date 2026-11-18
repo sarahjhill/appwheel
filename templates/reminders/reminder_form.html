@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block head_title %}{% if reminder %}Edit reminder{% else %}Add a reminder{% endif %}{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        {% if reminder %}
+            <h1>Edit reminder</h1>
+        {% elif kind == 'appointment' %}
+            <h1>Add an appointment</h1>
+            <p class="lead">We've added a list of things to take. Change it to suit you.</p>
+        {% elif kind == 'prescription' %}
+            <h1>Add a repeat prescription</h1>
+            <p class="lead">We'll remind you when it's time to order, then again each time it's due.</p>
+        {% else %}
+            <h1>Add a reminder</h1>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label|capfirst }}{% if not field.field.required %} <span class="optional">(optional)</span>{% endif %}
+                    </label>
+                    {% if field.help_text %}<p class="help-text">{{ field.help_text }}</p>{% endif %}
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="button">{% if reminder %}Save changes{% else %}Add reminder{% endif %}</button>
+        </form>
+        <p><a href="{% url 'reminder_list' %}">Cancel and go back</a></p>
+    </section>
+{% endblock content %}

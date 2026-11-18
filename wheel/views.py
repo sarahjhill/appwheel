@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -175,10 +176,10 @@ def statement_review(request):
                     name=item['name'],
                     plan_name=item.get('plan_name', ''),
                     category=item['category'],
-                    price=item['price'],
+                    price=Decimal(item['price']),
                     billing_period=item['billing_period'],
-                    next_payment_date=item.get('next_payment_date') or None,
-                    trial_end_date=item.get('trial_end_date') or None,
+                    next_payment_date=_to_date(item.get('next_payment_date')),
+                    trial_end_date=_to_date(item.get('trial_end_date')),
                 )
                 added += 1
         del request.session[SESSION_KEY]
@@ -189,6 +190,14 @@ def statement_review(request):
         return redirect('subscription_list')
 
     return render(request, 'wheel/statement_review.html', {'found': found})
+
+
+def _to_date(value):
+    """Dates are kept as text between pages; turn them back into dates."""
+    try:
+        return date.fromisoformat(value) if value else None
+    except (TypeError, ValueError):
+        return None
 
 
 @login_required

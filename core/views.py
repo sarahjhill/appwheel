@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+from reminders.automatic import roll_forward_payment_dates
 from wheel.health import summarise
 
 # The wheel fits up to 12 apps comfortably on a phone
@@ -10,6 +11,7 @@ WHEEL_MAX_APPS = 12
 @login_required
 def home(request):
     """The home page: the App Wheel."""
+    roll_forward_payment_dates(request.user)
     subscriptions = list(
         request.user.subscriptions.filter(status='active')
         .select_related('common_app')
@@ -27,6 +29,7 @@ def home(request):
         'hidden_count': len(subscriptions) - len(on_wheel),
         'paid_count': sum(1 for sub in subscriptions if sub.price),
         'summary': summary,
+        'coming_up': request.user.reminders.filter(is_done=False)[:3],
     })
 
 

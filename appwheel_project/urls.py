@@ -10,6 +10,8 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     # My apps and subscriptions (the App Wheel)
     path('apps/', include('wheel.urls')),
+    # Reminders: trials, renewals, appointments and prescriptions
+    path('reminders/', include('reminders.urls')),
     # The main app pages
     path('', include('core.urls')),
 ]

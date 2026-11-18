@@ -52,7 +52,7 @@ class CancelWithHelpTests(TestCase):
         summary = summarise(list(self.user.subscriptions.all()))
         self.assertEqual(summary['monthly_total'], Decimal('0'))
 
-        reminder = Reminder.objects.get()
+        reminder = Reminder.objects.get(kind='charge_check')
         self.assertEqual(reminder.user, self.user)
         self.assertEqual(reminder.title, "Check you weren't charged by Netflix")
         self.assertEqual(reminder.due_date, self.next_payment + timedelta(days=1))
@@ -60,7 +60,7 @@ class CancelWithHelpTests(TestCase):
     def test_cancelling_twice_does_not_make_two_reminders(self):
         self.client.post(reverse('mark_cancelled', args=[self.netflix.pk]))
         self.client.post(reverse('mark_cancelled', args=[self.netflix.pk]))
-        self.assertEqual(Reminder.objects.count(), 1)
+        self.assertEqual(Reminder.objects.filter(kind='charge_check').count(), 1)
 
     def test_cancelled_apps_leave_the_wheel_and_show_in_the_cancelled_list(self):
         self.client.post(reverse('mark_cancelled', args=[self.netflix.pk]))
@@ -75,7 +75,8 @@ class CancelWithHelpTests(TestCase):
         self.client.post(reverse('mark_active', args=[self.netflix.pk]))
         self.netflix.refresh_from_db()
         self.assertEqual(self.netflix.status, 'active')
-        self.assertEqual(Reminder.objects.count(), 0)
+        # The "check you weren't charged" reminder goes; the usual renewal reminder comes back
+        self.assertEqual(list(Reminder.objects.values_list('kind', flat=True)), ['renewal'])
 
     def test_refund_request_is_ready_written(self):
         self.client.post(reverse('mark_cancelled', args=[self.netflix.pk]))

@@ -27,6 +27,14 @@
             </nav>
         {% endif %}
     </header>
+    {% if user.is_authenticated %}
+        {% url 'home' as home_url %}{% url 'subscription_list' as apps_url %}{% url 'reminder_list' as reminders_url %}
+        <nav class="main-nav" aria-label="Main">
+            <a href="{{ home_url }}"{% if request.path == home_url %} aria-current="page"{% endif %}>Wheel</a>
+            <a href="{{ apps_url }}"{% if request.path == apps_url %} aria-current="page"{% endif %}>My apps</a>
+            <a href="{{ reminders_url }}"{% if request.path == reminders_url %} aria-current="page"{% endif %}>Reminders</a>
+        </nav>
+    {% endif %}
 
     <main id="main" class="page">
         {% if messages %}

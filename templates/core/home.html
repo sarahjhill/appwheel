@@ -70,6 +70,19 @@
                 <span><span class="key-dot badge-red" aria-hidden="true">✕</span>Needs action</span>
             </p>
 
+            {% if coming_up %}
+                <div class="coming-up">
+                    <h2>Coming up</h2>
+                    <ul>
+                        {% for reminder in coming_up %}
+                            <li class="kind-{{ reminder.kind }}"><span class="kind-dot" aria-hidden="true"></span>
+                                <span><strong>{{ reminder.due_date|date:"D j M" }}</strong> · {{ reminder.title }}</span></li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'reminder_list' %}">See all reminders</a>
+                </div>
+            {% endif %}
+
             {% if hidden_count %}
                 <p class="help-text wheel-more">Showing your {{ apps|length }} biggest costs. {{ hidden_count }} more in <a href="{% url 'subscription_list' %}">My apps</a>.</p>
             {% endif %}

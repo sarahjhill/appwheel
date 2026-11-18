@@ -1,0 +1,51 @@
+<li class="reminder kind-{{ reminder.kind }}{% if reminder.is_done %} is-done{% endif %}" id="reminder-{{ reminder.pk }}">
+    <p class="reminder-when">
+        <span class="kind-dot" aria-hidden="true"></span>
+        {% if not reminder.is_done and reminder.due_date < today %}Overdue · {% endif %}{% if reminder.due_date == today %}Today{% else %}{{ reminder.due_date|date:"D j M" }}{% endif %}{% if reminder.time %} · {{ reminder.time|time:"g:i A"|lower }}{% endif %}
+        <span class="visually-hidden">, {{ reminder.get_kind_display }}</span>
+    </p>
+    <h3 class="reminder-title">{{ reminder.title }}</h3>
+    {% if reminder.details %}<p class="reminder-details">{{ reminder.details|linebreaksbr }}</p>{% endif %}
+
+    {% if reminder.checklist.all %}
+        <ul class="checklist" aria-label="Checklist for {{ reminder.title }}">
+            {% for item in reminder.checklist.all %}
+                <li>
+                    <form method="post" action="{% url 'checklist_tick' item.pk %}" class="check-form">
+                        {% csrf_token %}
+                        <label>
+                            <input type="checkbox" name="ticked" data-autosubmit{% if item.ticked %} checked{% endif %}>
+                            <span>{{ item.text }}</span>
+                        </label>
+                        <noscript><button type="submit" class="link-button">Save</button></noscript>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="reminder-actions">
+        {% if not reminder.is_done %}
+            {% if reminder.kind == 'trial' or reminder.kind == 'renewal' %}
+                {% if reminder.subscription %}<a class="button button-small" href="{% url 'cancel_help' reminder.subscription.pk %}">Cancel with help</a>{% endif %}
+            {% elif reminder.kind == 'charge_check' and reminder.subscription %}
+                <a class="button button-small button-secondary" href="{% url 'refund_request' reminder.subscription.pk %}">I was charged</a>
+            {% elif reminder.kind == 'prescription' %}
+                <a class="button button-small" href="{{ nhs_app_url }}" target="_blank" rel="noopener noreferrer">Open the NHS App</a>
+            {% endif %}
+        {% endif %}
+        <form method="post" action="{% url 'reminder_done' reminder.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="button button-small{% if not reminder.is_done %} button-secondary{% endif %}">
+                {% if reminder.is_done %}Not done yet{% elif reminder.kind == 'charge_check' %}I wasn't charged{% else %}Mark as done{% endif %}
+                <span class="visually-hidden">: {{ reminder.title }}</span>
+            </button>
+        </form>
+        {% if not reminder.is_automatic and reminder.kind != 'charge_check' %}
+            <a href="{% url 'reminder_edit' reminder.pk %}">Edit<span class="visually-hidden"> {{ reminder.title }}</span></a>
+        {% endif %}
+        {% if not reminder.is_automatic %}
+            <a href="{% url 'reminder_delete' reminder.pk %}">Delete<span class="visually-hidden"> {{ reminder.title }}</span></a>
+        {% endif %}
+    </div>
+</li>

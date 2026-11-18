@@ -399,3 +399,47 @@ input[type="search"] {
     width: 100%; padding: 0.9rem 1rem; border-radius: 0.75rem; border: 1px solid #4a4170;
     background: #1b1636; color: var(--text); font: inherit; font-size: 0.95rem; line-height: 1.5;
 }
+
+/* Main navigation */
+.main-nav {
+    display: flex; justify-content: center; gap: 0.35rem; max-width: 40rem; margin: 0 auto; padding: 0 1.25rem;
+}
+.main-nav a {
+    flex: 1; text-align: center; padding: 0.6rem 0.5rem; min-height: 2.75rem; border-radius: 999px;
+    color: var(--muted); font-weight: 700; text-decoration: none; background: var(--card);
+}
+.main-nav a[aria-current="page"] { background: var(--accent); color: var(--accent-dark); }
+
+/* Reminders */
+.reminder-list { list-style: none; padding: 0; margin: 0.75rem 0; display: grid; gap: 0.75rem; }
+.reminder { padding: 0.9rem 1rem; border-radius: 1.1rem; background: #1b1636; border: 1px solid var(--line); }
+.reminder.is-done { opacity: 0.7; }
+.reminder-when { display: flex; align-items: center; gap: 0.45rem; margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.reminder-title { margin: 0.3rem 0; font-size: 1.05rem; }
+.reminder-details { margin: 0.25rem 0; color: var(--muted); font-size: 0.9rem; }
+.kind-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; background: var(--accent); }
+.kind-trial .kind-dot, .kind-charge_check .kind-dot { background: var(--red); }
+.kind-renewal .kind-dot { background: var(--amber); }
+.kind-appointment .kind-dot, .kind-prescription .kind-dot { background: #93c5fd; }
+.checklist { list-style: none; padding: 0; margin: 0.5rem 0; }
+.check-form { margin: 0; }
+.check-form label { display: flex; align-items: center; gap: 0.6rem; margin: 0; min-height: 2.5rem; font-weight: 500; cursor: pointer; }
+.reminder-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin-top: 0.5rem; font-weight: 700; }
+.reminder-actions form { margin: 0; }
+.button-small { min-height: 2.75rem; margin-top: 0; padding: 0 1rem; font-size: 0.9rem; }
+.done-reminders { margin-top: 1.5rem; }
+.done-reminders summary { cursor: pointer; font-weight: 800; min-height: 2.75rem; display: flex; align-items: center; }
+textarea {
+    width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; border: 1px solid #4a4170;
+    background: #1b1636; color: var(--text); font: inherit;
+}
+input[type="time"] {
+    width: 100%; min-height: 3rem; padding: 0.6rem 1rem; border-radius: 0.75rem; border: 1px solid #4a4170;
+    background: #1b1636; color: var(--text); font: inherit; color-scheme: dark;
+}
+
+/* Coming up (on the wheel page) */
+.coming-up { margin: 1.25rem 0; padding: 1rem; border-radius: 1.25rem; background: var(--card); }
+.coming-up h2 { margin: 0 0 0.5rem; font-size: 1rem; }
+.coming-up ul { list-style: none; padding: 0; margin: 0 0 0.5rem; display: grid; gap: 0.5rem; }
+.coming-up li { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.9rem; }
