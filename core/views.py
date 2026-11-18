@@ -6,6 +6,7 @@ from django.views.decorators.cache import cache_control
 
 from reminders.automatic import roll_forward_payment_dates
 from wheel.health import summarise
+from wheel.models import link_common_apps
 
 # The wheel fits up to 12 apps comfortably on a phone
 WHEEL_MAX_APPS = 12
@@ -15,6 +16,7 @@ WHEEL_MAX_APPS = 12
 def home(request):
     """The home page: the App Wheel."""
     roll_forward_payment_dates(request.user)
+    link_common_apps(request.user)
     subscriptions = list(
         request.user.subscriptions.filter(status='active')
         .select_related('common_app')
@@ -42,6 +44,12 @@ def _short_name(name):
         return name
     first_word = name.split()[0] if name.split() else name
     return (first_word if len(first_word) >= 3 else name)[:8]
+
+
+@login_required
+def account(request):
+    """Account settings: password, email, installing the app, deleting the account."""
+    return render(request, 'core/account.html')
 
 
 # ----- Installable app (PWA) -----

@@ -1,0 +1,1 @@
+{% load static %}{% if app.icon_path %}<img class="app-icon-img" src="{% static app.icon_path %}" alt="" loading="lazy">{% else %}<span class="app-initials tile-{{ app.category }}" aria-hidden="true">{{ app.initials }}</span>{% endif %}

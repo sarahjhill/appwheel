@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head_title %}My account{% endblock head_title %}
+{% block content %}
+    <section class="card">
+        <h1>My account</h1>
+        <p class="lead">Signed in as <strong>{{ user.email }}</strong></p>
+        <ul class="account-menu">
+            <li><a href="{% url 'account_change_password' %}">Change my password</a></li>
+            <li><a href="{% url 'account_email' %}">Manage my email</a></li>
+            <li><a href="{% url 'install' %}">Put AppWheel on my phone</a></li>
+            <li><a href="{% url 'diary_delete' %}">Delete my care diary</a></li>
+            <li><a class="danger-link" href="{% url 'delete_account' %}">Delete my account</a></li>
+        </ul>
+    </section>
+{% endblock content %}

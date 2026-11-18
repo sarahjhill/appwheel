@@ -1,0 +1,36 @@
+<a class="side-tab cal-tab" href="{% url 'reminder_list' %}" data-cal-tab aria-controls="cal-panel">
+    <span class="side-tab-label">Reminders</span>
+    <span class="todo-count" data-cal-badge{% if not reminders_this_week %} hidden{% endif %}>{{ reminders_this_week }}<span class="visually-hidden"> this week</span></span>
+</a>
+<aside id="cal-panel" class="side-panel cal-panel" aria-labelledby="cal-heading" data-cal-panel data-cal-url="{% url 'reminder_calendar' %}" tabindex="-1">
+    <div class="todo-head">
+        <h2 id="cal-heading">Reminders</h2>
+        <a class="close-button todo-close" href="#main" data-cal-close>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"></path></svg>
+            <span class="visually-hidden">Close the reminders calendar</span>
+        </a>
+    </div>
+    <div class="cal-bar">
+        <button type="button" class="round-button cal-step" data-cal-prev><span aria-hidden="true">‹</span><span class="visually-hidden">Previous month</span></button>
+        <h3 class="cal-title" data-cal-title aria-live="polite">Loading…</h3>
+        <button type="button" class="round-button cal-step" data-cal-next><span aria-hidden="true">›</span><span class="visually-hidden">Next month</span></button>
+    </div>
+    <button type="button" class="link-button cal-today" data-cal-today>Today</button>
+    <table class="cal-grid" data-cal-grid>
+        <thead>
+            <tr>
+                <th scope="col" abbr="Monday">M</th><th scope="col" abbr="Tuesday">T</th><th scope="col" abbr="Wednesday">W</th>
+                <th scope="col" abbr="Thursday">T</th><th scope="col" abbr="Friday">F</th><th scope="col" abbr="Saturday">S</th><th scope="col" abbr="Sunday">S</th>
+            </tr>
+        </thead>
+        <tbody data-cal-body></tbody>
+    </table>
+    <p class="cal-key" aria-hidden="true">
+        <span><span class="kind-dot kind-dot-red"></span>Act now</span>
+        <span><span class="kind-dot kind-dot-amber"></span>Renewal</span>
+        <span><span class="kind-dot kind-dot-blue"></span>Health</span>
+        <span><span class="kind-dot"></span>Other</span>
+    </p>
+    <section class="cal-day" aria-live="polite" data-cal-day></section>
+    <p><a href="{% url 'reminder_list' %}">See all reminders</a></p>
+</aside>

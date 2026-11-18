@@ -41,6 +41,17 @@ class CommonApp(models.Model):
     category = models.CharField(max_length=20, choices=Category.choices, default=Category.OTHER)
     cancel_url = models.URLField('cancel page', blank=True, help_text='The page where people cancel.')
     help_url = models.URLField('help page', blank=True)
+    website = models.CharField(
+        max_length=100, blank=True,
+        help_text='The company\'s own website, for example netflix.com. Used to fetch its official icon.',
+    )
+    icon = models.CharField(
+        max_length=100, blank=True,
+        help_text=(
+            'File name of the official icon in static/app-icons/, for example netflix.png. '
+            'Only add it if the company\'s brand rules allow. Leave blank to show initials.'
+        ),
+    )
     cancel_steps = models.TextField(
         blank=True,
         help_text='Simple steps to cancel, one per line. Check them on the company\'s own help page.',
@@ -184,7 +195,38 @@ class Subscription(models.Model):
         return (self.monthly_cost * 12).quantize(Decimal('0.01'))
 
     @property
+    def initials(self):
+        """Letters for the app's tile, e.g. 'Netflix' -> 'Ne', 'iCloud+' -> 'iC', 'Sky TV' -> 'ST'."""
+        words = [word for word in self.name.replace('+', ' ').split() if word]
+        if not words:
+            return '?'
+        if len(words) > 1:
+            return (words[0][0] + words[1][0]).upper()
+        word = words[0]
+        if word.isupper():
+            return word[:3]  # names that are already short capitals: EE, BT, NOW
+        letters = word[:2]
+        # Keep names like "iCloud" as they're written; otherwise "Ne" not "NE"
+        return letters if letters[0].islower() and letters[1:].isupper() else letters[0].upper() + letters[1:].lower()
+
+    @property
+    def icon_path(self):
+        """The official icon's file in static/, if one has been added for this app."""
+        if self.common_app and self.common_app.icon:
+            return f'app-icons/{self.common_app.icon}'
+        return ''
+
+    @property
     def cancel_step_list(self):
         if self.common_app and self.common_app.cancel_steps:
             return [step.strip() for step in self.common_app.cancel_steps.splitlines() if step.strip()]
         return []
+
+
+def link_common_apps(user):
+    """Link the user's apps to the common list by name, so they get icons, plans and guides."""
+    for subscription in user.subscriptions.filter(common_app__isnull=True):
+        common_app = CommonApp.objects.filter(name__iexact=subscription.name).first()
+        if common_app:
+            subscription.common_app = common_app
+            subscription.save(update_fields=['common_app'])

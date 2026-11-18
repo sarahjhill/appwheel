@@ -27,6 +27,9 @@
     }
 
     function setOpen(open, moveFocus) {
+        if (open) {
+            document.dispatchEvent(new CustomEvent('appwheel:panel-open', { detail: 'todo' }));
+        }
         panel.classList.toggle('is-open', open);
         document.body.classList.toggle('todo-is-open', open);
         tab.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -35,6 +38,12 @@
             (open ? newInput : tab).focus();
         }
     }
+
+    document.addEventListener('appwheel:panel-open', function (event) {
+        if (event.detail !== 'todo' && panel.classList.contains('is-open')) {
+            setOpen(false, false);
+        }
+    });
 
     tab.addEventListener('click', function (event) {
         event.preventDefault();

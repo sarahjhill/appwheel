@@ -37,7 +37,7 @@
                 {% for subscription in subscriptions %}
                     <li class="app-item">
                         <div>
-                            <h2 class="app-name">{{ subscription.name }}</h2>
+                            <h2 class="app-name app-name-with-icon"><span class="list-icon">{% include "wheel/_app_icon.html" with app=subscription %}</span>{{ subscription.name }}</h2>
                             {% if subscription.health %}
                                 <p class="light light-{{ subscription.health.light }}">
                                     <span aria-hidden="true">{{ subscription.health.symbol }}</span>

@@ -174,3 +174,47 @@ class RemindersPageTests(TestCase):
         response = self.client.get(reverse('home'))
         self.assertContains(response, 'Coming up')
         self.assertContains(response, 'Netflix renews')
+
+
+class CalendarPanelTests(TestCase):
+    def setUp(self):
+        self.user = make_user()
+        self.client.force_login(self.user)
+
+    def test_the_reminders_tab_is_on_every_page_with_this_weeks_count(self):
+        Reminder.objects.create(user=self.user, title='Soon', due_date=TODAY + timedelta(days=2))
+        Reminder.objects.create(user=self.user, title='Far', due_date=TODAY + timedelta(days=40))
+        response = self.client.get(reverse('help_page'))
+        self.assertContains(response, 'data-cal-panel')
+        self.assertContains(response, '1<span class="visually-hidden"> this week</span>')
+
+    def test_calendar_gives_the_months_reminders_by_day(self):
+        reminder = Reminder.objects.create(
+            user=self.user, title='GP appointment', kind='appointment', due_date=date(2027, 3, 9),
+        )
+        data = self.client.get(reverse('reminder_calendar'), {'month': '2027-03'}).json()
+        self.assertEqual(data['title'], 'March 2027')
+        item = data['days']['2027-03-09'][0]
+        self.assertEqual(item['title'], 'GP appointment')
+        self.assertEqual(item['kind'], 'appointment')
+        self.assertEqual(item['url'], f"{reverse('reminder_list')}#reminder-{reminder.pk}")
+
+    def test_calendar_includes_days_from_next_door_months(self):
+        Reminder.objects.create(user=self.user, title='Start of April', due_date=date(2027, 4, 2))
+        Reminder.objects.create(user=self.user, title='Summer', due_date=date(2027, 7, 1))
+        data = self.client.get(reverse('reminder_calendar'), {'month': '2027-03'}).json()
+        self.assertIn('2027-04-02', data['days'])
+        self.assertNotIn('2027-07-01', data['days'])
+
+    def test_a_bad_month_shows_this_month(self):
+        data = self.client.get(reverse('reminder_calendar'), {'month': 'banana'}).json()
+        self.assertEqual(data['month'], f'{TODAY:%Y-%m}')
+
+    def test_calendar_never_shows_someone_elses_reminders(self):
+        Reminder.objects.create(user=make_user('alex'), title='Alex secret', due_date=TODAY)
+        data = self.client.get(reverse('reminder_calendar')).json()
+        self.assertNotIn('Alex secret', str(data))
+
+    def test_add_a_reminder_for_a_chosen_day(self):
+        response = self.client.get(reverse('reminder_add'), {'kind': 'other', 'date': '2027-03-09'})
+        self.assertContains(response, 'value="2027-03-09"')

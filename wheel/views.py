@@ -10,7 +10,7 @@ from .health import summarise
 from .forms import ScreenshotUploadForm, StatementUploadForm, SubscriptionForm
 from reminders.models import Reminder
 
-from .models import CommonApp, Subscription
+from .models import CommonApp, Subscription, link_common_apps
 from .statement import StatementError, find_regular_payments, read_statement
 
 # Where the payments we found are kept between the upload and review pages
@@ -20,6 +20,7 @@ SESSION_KEY = 'statement_found'
 @login_required
 def subscription_list(request):
     """Show the apps that belong to the signed-in user, and nobody else's."""
+    link_common_apps(request.user)
     everything = list(
         request.user.subscriptions.select_related('common_app').prefetch_related('common_app__plans')
     )

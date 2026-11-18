@@ -111,3 +111,26 @@ class ServiceWorkerFreshnessTests(TestCase):
         script = self.client.get('/sw.js').content.decode()
         self.assertIn("fetch(request).then(function (response)", script)
         self.assertNotIn("return saved || fetch(request)", script)
+
+
+class AccountMenuTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='sam', email='sam@example.com', password='a-long-test-password-123'
+        )
+        self.client.force_login(self.user)
+
+    def test_account_link_is_in_the_menu_next_to_log_out(self):
+        response = self.client.get(reverse('home'))
+        self.assertContains(response, f'class="account-link" href="{reverse("account")}"')
+        self.assertContains(response, 'Log out')
+
+    def test_account_page_has_the_account_options(self):
+        response = self.client.get(reverse('account'))
+        self.assertContains(response, 'sam@example.com')
+        for link in ['account_change_password', 'account_email', 'install', 'delete_account']:
+            self.assertContains(response, reverse(link))
+
+    def test_account_page_needs_logging_in(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse('account')).status_code, 302)

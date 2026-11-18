@@ -17,7 +17,7 @@ class CommonAppPlanInline(admin.TabularInline):
 
 @admin.register(CommonApp)
 class CommonAppAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'plan_count')
+    list_display = ('name', 'category', 'website', 'icon', 'plan_count')
     list_filter = ('category',)
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}

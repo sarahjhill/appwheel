@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('', views.reminder_list, name='reminder_list'),
     path('add/', views.reminder_add, name='reminder_add'),
+    path('calendar/', views.reminder_calendar, name='reminder_calendar'),
     path('<int:pk>/edit/', views.reminder_edit, name='reminder_edit'),
     path('<int:pk>/done/', views.reminder_done, name='reminder_done'),
     path('<int:pk>/delete/', views.reminder_delete, name='reminder_delete'),

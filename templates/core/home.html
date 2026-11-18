@@ -34,7 +34,7 @@
                                         data-price="{% if app.price %}£{{ app.monthly_cost|floatformat:"2g" }} / month{% else %}Free app{% endif %}"
                                         aria-label="{{ app.name }}, {% if app.price %}£{{ app.monthly_cost|floatformat:"2g" }} a month{% else %}free{% endif %}, {{ app.health.label|lower }}">
                                     <span class="wheel-app-face">
-                                        <span class="wheel-app-name">{{ app.short_name }}</span>
+                                        {% include "wheel/_app_icon.html" %}
                                         <span class="wheel-badge badge-{{ app.health.light }}" aria-hidden="true">{{ app.health.symbol }}</span>
                                     </span>
                                 </button>
@@ -95,7 +95,7 @@
             {% for app in apps %}
                 <dialog class="app-card" id="card-{{ app.pk }}" aria-labelledby="card-{{ app.pk }}-title">
                     <div class="card-head">
-                        <span class="card-tile light-border-{{ app.health.light }}" aria-hidden="true">{{ app.short_name }}</span>
+                        <span class="card-tile light-border-{{ app.health.light }}" aria-hidden="true">{% include "wheel/_app_icon.html" %}</span>
                         <div class="card-title">
                             <h2 id="card-{{ app.pk }}-title">{{ app.name }}</h2>
                             <p>{% if app.plan_name %}{{ app.plan_name }} · {% endif %}{{ app.get_category_display }}</p>
@@ -157,16 +157,6 @@
         </section>
     {% endif %}
 
-    <section class="card account-links">
-        <h2>Your account</h2>
-        <p>Signed in as <strong>{{ user.email }}</strong></p>
-        <ul class="plain-list">
-            <li><a href="{% url 'account_change_password' %}">Change my password</a></li>
-            <li><a href="{% url 'account_email' %}">Manage my email</a></li>
-            <li><a href="{% url 'install' %}">Put AppWheel on my phone</a></li>
-            <li><a href="{% url 'delete_account' %}">Delete my account</a></li>
-        </ul>
-    </section>
 {% endblock content %}
 
 {% block extra_body %}

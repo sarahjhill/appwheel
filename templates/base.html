@@ -28,6 +28,11 @@
         </a>
         {% if user.is_authenticated %}
             <nav aria-label="Account">
+                {% url 'account' as account_url %}
+                <a class="account-link" href="{{ account_url }}"{% if request.path == account_url %} aria-current="page"{% endif %}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"></circle><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+                    <span class="account-text">Account</span>
+                </a>
                 <form method="post" action="{% url 'account_logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="link-button">Log out</button>
@@ -56,9 +61,9 @@
         {% endif %}
         {% block content %}{% endblock content %}
     </main>
-    {% if user.is_authenticated %}{% include "todos/_panel.html" %}{% endif %}
+    {% if user.is_authenticated %}{% include "todos/_panel.html" %}{% include "reminders/_calendar_panel.html" %}{% endif %}
     {% block extra_body %}{% endblock extra_body %}
     <script src="{% static 'js/pwa.js' %}" defer></script>
-    {% if user.is_authenticated %}<script src="{% static 'js/todo.js' %}" defer></script>{% endif %}
+    {% if user.is_authenticated %}<script src="{% static 'js/todo.js' %}" defer></script><script src="{% static 'js/calendar.js' %}" defer></script>{% endif %}
 </body>
 </html>

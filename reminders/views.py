@@ -1,7 +1,9 @@
+import calendar
 from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -49,7 +51,12 @@ def reminder_add(request):
             messages.success(request, 'Your reminder has been added.')
             return redirect('reminder_list')
     else:
+        try:
+            chosen_day = date.fromisoformat(request.GET.get('date', ''))
+        except ValueError:
+            chosen_day = None
         form = ReminderForm(initial={
+            'due_date': chosen_day,
             'kind': kind,
             'title': STARTING_TITLES[kind],
             'checklist_text': '\n'.join(DEFAULT_CHECKLIST.get(kind, [])),
@@ -130,3 +137,40 @@ def reminder_delete(request, pk):
         messages.success(request, 'Your reminder has been deleted.')
         return redirect('reminder_list')
     return render(request, 'reminders/reminder_confirm_delete.html', {'reminder': reminder})
+
+
+@login_required
+def reminder_calendar(request):
+    """
+    The reminders for one month (plus the days either side that show on the
+    calendar), for the calendar panel on the left of every page.
+    """
+    roll_forward_payment_dates(request.user)
+    today = date.today()
+    try:
+        year, month = (int(part) for part in request.GET.get('month', '').split('-'))
+        first = date(year, month, 1)
+    except ValueError:
+        first = today.replace(day=1)
+    last = first.replace(day=calendar.monthrange(first.year, first.month)[1])
+    start, end = first - timedelta(days=6), last + timedelta(days=6)
+
+    days = {}
+    reminders = request.user.reminders.filter(due_date__range=(start, end))
+    for reminder in reminders:
+        days.setdefault(reminder.due_date.isoformat(), []).append({
+            'id': reminder.pk,
+            'title': reminder.title,
+            'kind': reminder.kind,
+            'kind_label': reminder.get_kind_display(),
+            'time': reminder.time.strftime('%H:%M') if reminder.time else '',
+            'done': reminder.is_done,
+            'url': f"{reverse('reminder_list')}#reminder-{reminder.pk}",
+        })
+    return JsonResponse({
+        'month': f'{first:%Y-%m}',
+        'title': f'{first:%B %Y}',
+        'today': today.isoformat(),
+        'days': days,
+        'add_url': reverse('reminder_add'),
+    })
